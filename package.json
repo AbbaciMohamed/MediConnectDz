@@ -16,5 +16,8 @@
     "url": "https://github.com/AbbaciMohamed/MediConnectDz/issues"
   },
   "homepage": "https://github.com/AbbaciMohamed/MediConnectDz#readme",
-  "description": ""
+  "description": "",
+  "dependencies": {
+    "mongoose": "^8.16.1"
+  }
 }
