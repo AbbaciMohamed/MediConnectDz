@@ -16,6 +16,7 @@ db = connectDB();
 app.use('/auth', require('./auth-profile/routes/auth'));
 app.use('/profile', require('./auth-profile/routes/profile'));
 app.use('/appointments', require('./auth-profile/routes/appointment'));
+app.use('/chat', require('./clinic-chat/routes/chat'));
 
 app.use((req, res) => res.status(404).json({ message: 'Not Found' }));
 app.use((err, req, res, next) => res.status(500).json({ message: 'Internal Server Error' }));
