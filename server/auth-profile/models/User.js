@@ -14,7 +14,26 @@ const userSchema = new mongoose.Schema({
     address: String,
     healthInfo: String
   },
-  certificate: { type: String, default: null }
+  certificate: { type: String, default: null },
+  subscriptionPlan: { type: String, default: null }, // e.g., 'basic', 'premium' (required for clinics)
+  subscriptionStart: { type: Date, default: null },
+  subscriptionEnd: { type: Date, default: null },
+  subscriptionActive: { type: Boolean, default: false },
+  premiumFeatures: { type: Boolean, default: false }, // for doctors
+  schedule: [
+    {
+      day: String, // e.g., 'Monday'
+      startHour: String, // e.g., '09:00'
+      endHour: String // e.g., '17:00'
+    }
+  ],
+  notifications: [
+    {
+      message: String,
+      date: { type: Date, default: Date.now },
+      read: { type: Boolean, default: false }
+    }
+  ]
 });
 
 module.exports = mongoose.model('User', userSchema); 
