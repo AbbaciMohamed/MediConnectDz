@@ -1,4 +1,6 @@
 const express = require('express');
+const { getProfile, updateProfile, generateShareKey, accessWithKey, setSchedule, getSchedule, getNotifications, markNotificationRead } = require('../controllers/profileController');
+const auth = require('../../shared/middleware/auth');
 const router = express.Router();
 const { body } = require('express-validator');
 const profileController = require('../controllers/profileController');
@@ -32,5 +34,13 @@ router.put('/change-password', [
   body('newPassword').isLength({ min: 6 }),
   validateRequest
 ], profileController.changePassword);
+
+// Doctor schedule management
+router.post('/schedule', auth, setSchedule);
+router.get('/schedule', auth, getSchedule);
+
+// Doctor notifications
+router.get('/notifications', auth, getNotifications);
+router.post('/notifications/read', auth, markNotificationRead);
 
 module.exports = router; 
