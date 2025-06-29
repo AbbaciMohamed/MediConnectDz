@@ -83,4 +83,63 @@ const accessWithKey = async (req, res) => {
   }
 };
 
-module.exports = { getProfile, updateProfile, generateShareKey, accessWithKey }; 
+// Doctor: set or update working hours
+const setSchedule = async (req, res) => {
+  try {
+    if (req.user.role !== 'doctor') return res.status(403).json({ message: 'Only doctors can set schedule' });
+    const user = await User.findOneAndUpdate(
+      { userId: req.user.userId },
+      { $set: { schedule: req.body.schedule } },
+      { new: true }
+    );
+    res.json(user.schedule);
+  } catch (err) {
+    res.status(500).json({ message: 'Error setting schedule', error: err.message });
+  }
+};
+
+// Doctor: get working hours
+const getSchedule = async (req, res) => {
+  try {
+    if (req.user.role !== 'doctor') return res.status(403).json({ message: 'Only doctors can view schedule' });
+    const user = await User.findOne({ userId: req.user.userId });
+    res.json(user.schedule);
+  } catch (err) {
+    res.status(500).json({ message: 'Error getting schedule', error: err.message });
+  }
+};
+
+// Doctor: get notifications
+const getNotifications = async (req, res) => {
+  try {
+    const user = await User.findOne({ userId: req.user.userId });
+    res.json(user.notifications || []);
+  } catch (err) {
+    res.status(500).json({ message: 'Error getting notifications', error: err.message });
+  }
+};
+
+// Doctor: mark notification as read
+const markNotificationRead = async (req, res) => {
+  try {
+    const { notificationIndex } = req.body;
+    const user = await User.findOne({ userId: req.user.userId });
+    if (!user.notifications || !user.notifications[notificationIndex]) return res.status(404).json({ message: 'Notification not found' });
+    user.notifications[notificationIndex].read = true;
+    await user.save();
+    res.json(user.notifications);
+  } catch (err) {
+    res.status(500).json({ message: 'Error marking notification as read', error: err.message });
+  }
+};
+
+module.exports = {
+  getProfile,
+  updateProfile,
+  generateShareKey,
+  accessWithKey,
+  setSchedule,
+  getSchedule,
+  getNotifications,
+  markNotificationRead
+}; 
