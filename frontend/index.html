@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MediConnect DZ Test Frontend</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 2rem; }
+    form { margin-bottom: 2rem; }
+    input, button { margin: 0.2rem; }
+    .result { background: #f0f0f0; padding: 1rem; margin-top: 1rem; }
+  </style>
+</head>
+<body>
+  <h1>MediConnect DZ Backend Test</h1>
+
+  <h2>Register</h2>
+  <form id="registerForm">
+    <input name="userId" placeholder="User ID" required />
+    <input name="name" placeholder="Name" required />
+    <input name="email" placeholder="Email" required />
+    <input name="password" type="password" placeholder="Password" required />
+    <select name="role">
+      <option value="patient">Patient</option>
+      <option value="doctor">Doctor</option>
+      <option value="nurse">Nurse</option>
+      <option value="admin">Admin</option>
+    </select>
+    <button type="submit">Register</button>
+  </form>
+  <div id="registerResult" class="result"></div>
+
+  <h2>Login</h2>
+  <form id="loginForm">
+    <input name="userId" placeholder="User ID" required />
+    <input name="password" type="password" placeholder="Password" required />
+    <button type="submit">Login</button>
+  </form>
+  <div id="loginResult" class="result"></div>
+
+  <h2>Profile</h2>
+  <form id="profileForm">
+    <input name="userId" placeholder="User ID" required />
+    <button type="submit">Fetch Profile</button>
+  </form>
+  <div id="profileResult" class="result"></div>
+
+  <h2>Book Appointment</h2>
+  <form id="appointmentForm">
+    <input name="doctorId" placeholder="Doctor ID" required />
+    <input name="date" type="datetime-local" required />
+    <button type="submit">Book</button>
+  </form>
+  <div id="appointmentResult" class="result"></div>
+
+  <script>
+    let jwt = '';
+
+    document.getElementById('registerForm').onsubmit = async (e) => {
+      e.preventDefault();
+      const data = Object.fromEntries(new FormData(e.target));
+      const res = await fetch('/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      document.getElementById('registerResult').textContent = await res.text();
+    };
+
+    document.getElementById('loginForm').onsubmit = async (e) => {
+      e.preventDefault();
+      const data = Object.fromEntries(new FormData(e.target));
+      const res = await fetch('/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      const result = await res.json();
+      document.getElementById('loginResult').textContent = JSON.stringify(result, null, 2);
+      if (result.token) jwt = result.token;
+    };
+
+    document.getElementById('profileForm').onsubmit = async (e) => {
+      e.preventDefault();
+      const userId = new FormData(e.target).get('userId');
+      const res = await fetch(`/profile/${userId}`, {
+        headers: { Authorization: 'Bearer ' + jwt }
+      });
+      document.getElementById('profileResult').textContent = await res.text();
+    };
+
+    document.getElementById('appointmentForm').onsubmit = async (e) => {
+      e.preventDefault();
+      const data = Object.fromEntries(new FormData(e.target));
+      const res = await fetch('/appointments/book', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer ' + jwt
+        },
+        body: JSON.stringify(data)
+      });
+      document.getElementById('appointmentResult').textContent = await res.text();
+    };
+  </script>
+</body>
+</html> 
