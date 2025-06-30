@@ -1,7 +1,10 @@
 const User = require('../models/User');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+<<<<<<< HEAD
 const Log = require('../models/Log');
+=======
+>>>>>>> 60e8ea46ae399ddd87994bb31871f0b31cb43f20
 
 // Helper validation functions
 function isValidEmail(email) {
@@ -14,9 +17,12 @@ function isStrongPassword(password) {
 const register = async (req, res) => {
   try {
     const { userId, name, email, password, role, subscriptionPlan, subscriptionDuration } = req.body;
+<<<<<<< HEAD
     
     console.log('Registration attempt:', { userId, name, email, role, hasFile: !!req.file });
     
+=======
+>>>>>>> 60e8ea46ae399ddd87994bb31871f0b31cb43f20
     // Basic validation
     if (!userId || !name || !email || !password || !role) {
       return res.status(400).json({ message: 'All fields are required' });
@@ -27,6 +33,7 @@ const register = async (req, res) => {
     if (!isStrongPassword(password)) {
       return res.status(400).json({ message: 'Password must be at least 8 characters, include a number and an uppercase letter' });
     }
+<<<<<<< HEAD
     
     // Check if user already exists
     const existingUser = await User.findOne({ $or: [{ email }, { userId }] });
@@ -46,6 +53,16 @@ const register = async (req, res) => {
       }
     }
     
+=======
+    // Certificate validation for doctor/hospital
+    let certificate = null;
+    if (role === 'doctor' || role === 'hospital') {
+      if (!req.file) {
+        return res.status(400).json({ message: 'Certificate file is required for doctor/hospital' });
+      }
+      certificate = req.file.filename;
+    }
+>>>>>>> 60e8ea46ae399ddd87994bb31871f0b31cb43f20
     // Subscription logic
     let subPlan = null, subStart = null, subEnd = null, subActive = false, premiumFeatures = false;
     if (role === 'clinic') {
@@ -68,6 +85,7 @@ const register = async (req, res) => {
       } else {
         premiumFeatures = false;
       }
+<<<<<<< HEAD
     } else if (role === 'supplier' || role === 'patient') {
       // Suppliers and patients: no subscription/certificate required for now
       subPlan = null;
@@ -77,6 +95,9 @@ const register = async (req, res) => {
       premiumFeatures = false;
     }
     
+=======
+    }
+>>>>>>> 60e8ea46ae399ddd87994bb31871f0b31cb43f20
     const hashedPassword = await bcrypt.hash(password, 10);
     const user = new User({
       userId, name, email, password: hashedPassword, role, certificate,
@@ -86,6 +107,7 @@ const register = async (req, res) => {
       subscriptionActive: subActive,
       premiumFeatures
     });
+<<<<<<< HEAD
     
     await user.save();
     await Log.create({ message: 'User registered successfully', level: 'info', meta: { userId, email, role } });
@@ -94,6 +116,11 @@ const register = async (req, res) => {
   } catch (err) {
     await Log.create({ message: 'Registration error', level: 'error', meta: { error: err.message } });
     console.error('Registration error:', err);
+=======
+    await user.save();
+    res.status(201).json({ message: 'User registered' });
+  } catch (err) {
+>>>>>>> 60e8ea46ae399ddd87994bb31871f0b31cb43f20
     res.status(400).json({ message: 'Registration error', error: err.message });
   }
 };
@@ -102,6 +129,7 @@ const login = async (req, res) => {
   try {
     const { userId, password } = req.body;
     const user = await User.findOne({ userId });
+<<<<<<< HEAD
     if (!user) {
       await Log.create({ message: 'Login failed: user not found', level: 'warn', meta: { userId } });
       return res.status(404).json({ message: 'User not found' });
@@ -111,6 +139,11 @@ const login = async (req, res) => {
       await Log.create({ message: 'Login failed: incorrect password', level: 'warn', meta: { userId } });
       return res.status(401).json({ message: 'Incorrect password' });
     }
+=======
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    const match = await bcrypt.compare(password, user.password);
+    if (!match) return res.status(401).json({ message: 'Incorrect password' });
+>>>>>>> 60e8ea46ae399ddd87994bb31871f0b31cb43f20
     // Subscription checks
     if (user.role === 'clinic') {
       if (!user.subscriptionActive || !user.subscriptionEnd || user.subscriptionEnd < new Date()) {
@@ -126,14 +159,20 @@ const login = async (req, res) => {
       await user.save();
     }
     const token = jwt.sign({ userId: user.userId, role: user.role }, process.env.JWT_SECRET, { expiresIn: '2h' });
+<<<<<<< HEAD
     await Log.create({ message: 'User login successful', level: 'info', meta: { userId, role: user.role } });
     res.status(200).json({ token, premiumFeatures: user.premiumFeatures });
   } catch (err) {
     await Log.create({ message: 'Login error', level: 'error', meta: { error: err.message } });
+=======
+    res.status(200).json({ token, premiumFeatures: user.premiumFeatures });
+  } catch (err) {
+>>>>>>> 60e8ea46ae399ddd87994bb31871f0b31cb43f20
     res.status(500).json({ message: 'Login error', error: err.message });
   }
 };
 
+<<<<<<< HEAD
 const getAllUsers = async (req, res) => {
   try {
     const users = await User.find({}, '-password');
@@ -153,3 +192,6 @@ const getLogs = async (req, res) => {
 };
 
 module.exports = { register, login, getAllUsers, getLogs }; 
+=======
+module.exports = { register, login }; 
+>>>>>>> 60e8ea46ae399ddd87994bb31871f0b31cb43f20

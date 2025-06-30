@@ -1,23 +1,35 @@
 const mongoose = require('mongoose');
+<<<<<<< HEAD
 const { encryptField, decryptField } = require('../../shared/utils/encryption');
+=======
+>>>>>>> 60e8ea46ae399ddd87994bb31871f0b31cb43f20
 
 const userSchema = new mongoose.Schema({
   userId: { type: String, unique: true, required: true },
   name: String,
   email: { type: String, unique: true },
   password: String,
+<<<<<<< HEAD
   role: { type: String, enum: ['patient', 'doctor', 'nurse', 'admin', 'clinic', 'supplier'] },
   clinicId: { type: String, default: null },
   planType: { type: String, enum: ['Basic', 'Pro', 'Enterprise'], default: 'Basic' },
   planActivatedAt: { type: Date, default: null },
   planExpiresAt: { type: Date, default: null },
+=======
+  role: { type: String, enum: ['patient', 'doctor', 'nurse', 'admin'] },
+  clinicId: { type: String, default: null },
+>>>>>>> 60e8ea46ae399ddd87994bb31871f0b31cb43f20
   profile: {
     age: Number,
     gender: String,
     phone: String,
     address: String,
+<<<<<<< HEAD
     healthInfo: String, // will be encrypted
     medicalHistory: String // will be encrypted
+=======
+    healthInfo: String
+>>>>>>> 60e8ea46ae399ddd87994bb31871f0b31cb43f20
   },
   certificate: { type: String, default: null },
   subscriptionPlan: { type: String, default: null }, // e.g., 'basic', 'premium' (required for clinics)
@@ -41,6 +53,7 @@ const userSchema = new mongoose.Schema({
   ]
 });
 
+<<<<<<< HEAD
 // Encrypt healthInfo and medicalHistory before save
 userSchema.pre('save', function(next) {
   if (this.profile) {
@@ -66,4 +79,6 @@ userSchema.post('init', function(doc) {
   }
 });
 
+=======
+>>>>>>> 60e8ea46ae399ddd87994bb31871f0b31cb43f20
 module.exports = mongoose.model('User', userSchema); 
