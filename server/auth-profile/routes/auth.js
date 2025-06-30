@@ -1,5 +1,5 @@
 const express = require('express');
-const { register, login } = require('../controllers/authController');
+const { register, login, getAllUsers, getLogs } = require('../controllers/authController');
 const router = express.Router();
 const multer = require('multer');
 const path = require('path');
@@ -17,5 +17,7 @@ const upload = multer({ storage });
 
 router.post('/register', upload.single('certificate'), register);
 router.post('/login', login);
+router.get('/users', getAllUsers);
+router.get('/logs', getLogs);
 
 module.exports = router; 

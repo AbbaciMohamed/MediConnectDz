@@ -41,6 +41,14 @@ app.use('/auth', require('./auth-profile/routes/auth'));
 app.use('/profile', require('./auth-profile/routes/profile'));
 app.use('/appointments', require('./auth-profile/routes/appointment'));
 app.use('/chat', require('./clinic-chat/routes/chat'));
+app.use('/plans', require('./paid-plans/routes/plan'));
+app.use('/compliance', require('./compliance/routes/compliance'));
+app.use('/analytics', require('./clinic-chat/routes/analytics'));
+app.use('/sponsor', require('./clinic-chat/routes/sponsor'));
+app.use('/api/tenders', require('./clinic-chat/routes/marketplace'));
+app.use('/api/clinics', require('./clinic-chat/routes/clinicSearch'));
+app.use('/api/clinics', require('./clinic-chat/routes/clinicProfile'));
+app.use('/api/gemini-chatbot', require('./clinic-chat/routes/geminiChatbot'));
 
 app.use((req, res) => res.status(404).json({ message: 'Not Found' }));
 app.use((err, req, res, next) => {
