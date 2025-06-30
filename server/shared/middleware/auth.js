@@ -13,9 +13,6 @@ const auth = (req, res, next) => {
   }
 };
 
-<<<<<<< HEAD
-module.exports = auth; 
-=======
 // Placeholder auth middleware - to be implemented
 const authenticateToken = async (req, res, next) => {
   // For now, just pass through - will be implemented by Ayoub
@@ -33,8 +30,8 @@ const authenticateDoctor = async (req, res, next) => {
 };
 
 module.exports = {
+  auth,
   authenticateToken,
   authenticateAdmin,
   authenticateDoctor
-}; 
->>>>>>> 60e8ea46ae399ddd87994bb31871f0b31cb43f20
+};
