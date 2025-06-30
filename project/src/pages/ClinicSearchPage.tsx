@@ -204,12 +204,32 @@ const ClinicSearchPage = () => {
 
   const detectLocation = async () => {
     setIsLocationDetecting(true);
-    setTimeout(() => {
-      setSearchQuery('Algiers, Algeria');
-      setSuggestions([]);
-      setShowResults(true);
+    if (!navigator.geolocation) {
+      alert('Geolocation is not supported by your browser.');
       setIsLocationDetecting(false);
-    }, 2000);
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const { latitude, longitude } = position.coords;
+        try {
+          const response = await fetch(`http://localhost:5000/api/clinics?lat=${latitude}&lng=${longitude}`);
+          const clinics = await response.json();
+          // You may want to update a clinics state variable here
+          // setClinics(clinics);
+          setSearchQuery('Clinics near you');
+          setSuggestions([]);
+          setShowResults(true);
+        } catch (error) {
+          alert('Failed to fetch clinics near you.');
+        }
+        setIsLocationDetecting(false);
+      },
+      (error) => {
+        alert('Location access denied. Please enable location services.');
+        setIsLocationDetecting(false);
+      }
+    );
   };
 
   const filteredClinics = mockClinics.filter(clinic => {

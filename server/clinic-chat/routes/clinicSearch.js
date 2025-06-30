@@ -5,7 +5,7 @@ const router = express.Router();
 // GET /api/clinics - list/search/filter clinics
 router.get('/', async (req, res) => {
   try {
-    const { search, specialty, location, rating } = req.query;
+    const { search, specialty, location, rating, lat, lng } = req.query;
     let query = {};
     if (search) {
       query.$or = [
@@ -17,7 +17,20 @@ router.get('/', async (req, res) => {
     if (specialty && specialty !== 'all') query.specialties = specialty;
     if (location && location !== 'all') query.location = location;
     if (rating) query.rating = { $gte: Number(rating) };
-    const clinics = await Clinic.find(query).sort({ rating: -1 });
+    let clinics;
+    if (lat && lng) {
+      clinics = await Clinic.find({
+        ...query,
+        mapCoordinates: {
+          $near: {
+            $geometry: { type: 'Point', coordinates: [parseFloat(lng), parseFloat(lat)] },
+            $maxDistance: 50000
+          }
+        }
+      });
+    } else {
+      clinics = await Clinic.find(query).sort({ rating: -1 });
+    }
     res.json(clinics);
   } catch (err) {
     res.status(500).json({ message: 'Error fetching clinics', error: err.message });

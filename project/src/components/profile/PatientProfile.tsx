@@ -101,10 +101,21 @@ const PatientProfile: React.FC<PatientProfileProps> = ({ patient }) => {
     }
   ];
 
-  const handleSave = () => {
-    // In real app, this would make an API call
-    console.log('Saving patient data:', editData);
-    setIsEditing(false);
+  const handleSave = async () => {
+    try {
+      const response = await fetch(`http://localhost:5000/profile/${editData.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(editData),
+        credentials: 'include',
+      });
+      if (!response.ok) throw new Error('Failed to update profile');
+      // Optionally update local state with new data
+      setIsEditing(false);
+      alert('Profile updated successfully!');
+    } catch (error) {
+      alert('Error updating profile. Please try again.');
+    }
   };
 
   const handleCancel = () => {

@@ -15,7 +15,13 @@ const clinicSchema = new mongoose.Schema({
   acceptedInsurance: [String],
   operatingHours: Object,
   isVerified: { type: Boolean, default: false },
-  trialEndsAt: Date
+  trialEndsAt: Date,
+  mapCoordinates: {
+    type: { type: String, enum: ['Point'], default: 'Point' },
+    coordinates: { type: [Number], default: [0, 0] }
+  }
 });
+
+clinicSchema.index({ mapCoordinates: '2dsphere' });
 
 module.exports = mongoose.model('Clinic', clinicSchema); 

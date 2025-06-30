@@ -58,50 +58,6 @@ const GeminiChatbot = () => {
     return prompts[role as keyof typeof prompts] || prompts.patient;
   };
 
-  const simulateGeminiResponse = async (message: string, role: string): Promise<string> => {
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 2000));
-
-    const responses = {
-      patient: {
-        'find clinic': "I can help you find clinics near you! To get started, I'll need to know your location and what type of healthcare service you're looking for. Are you looking for:\n\n• General medicine\n• Specialist care (cardiology, dermatology, etc.)\n• Emergency services\n• Dental care\n\nYou can also use our clinic search feature on the main page to filter by location, specialty, and insurance accepted.",
-        'appointment': "To book an appointment, you can:\n\n1. **Search for a clinic** using our clinic finder\n2. **Select your preferred provider** from the results\n3. **Choose an available time slot** that works for you\n4. **Confirm your booking** with your contact details\n\nWould you like me to guide you through finding a specific type of healthcare provider?",
-        'vaccines': "Vaccination needs depend on several factors including your age, health conditions, travel plans, and vaccination history. Common vaccines for adults in Algeria include:\n\n• **Annual flu vaccine**\n• **COVID-19 boosters**\n• **Hepatitis A & B** (especially for healthcare workers)\n• **Tetanus/Diphtheria** (every 10 years)\n\n⚠️ **Important**: Please consult with a healthcare provider for personalized vaccination recommendations based on your medical history.",
-        'emergency': "For medical emergencies, please:\n\n🚨 **Call 14 (SAMU) or 15 (Civil Protection)** immediately\n\nFor non-emergency urgent care, you can:\n• Use our clinic finder to locate nearby emergency rooms\n• Look for clinics with \"ER Open\" status\n• Contact your primary care provider\n\nRemember: If you're experiencing chest pain, difficulty breathing, severe bleeding, or loss of consciousness, call emergency services immediately."
-      },
-      clinic: {
-        'security': "The Security Medicine Suite provides comprehensive protection for your healthcare facility:\n\n**Available Scans:**\n• **Vulnerability Assessment** - Network and system security\n• **Compliance Check** - HIPAA/GDPR requirements\n• **Device Monitoring** - Medical equipment security\n\n**To configure a scan:**\n1. Go to Dashboard → Security Suite\n2. Select scan type and schedule\n3. Review results and recommendations\n\nWould you like me to explain any specific security feature?",
-        'analytics': "Your analytics dashboard provides insights into:\n\n📊 **Key Metrics:**\n• Patient appointment trends\n• Satisfaction scores and reviews\n• Revenue and growth tracking\n• Wait time optimization\n\n📈 **Advanced Features (Pro/Enterprise):**\n• Predictive analytics\n• Patient retention forecasts\n• Comparative benchmarking\n\nTo access detailed analytics, navigate to Dashboard → Analytics. Need help interpreting any specific metrics?",
-        'subscription': "**Current Subscription Management:**\n\n• **View current plan** and usage\n• **Upgrade/downgrade** options\n• **Billing history** and invoices\n• **Feature comparisons**\n\n**Available Plans:**\n• **Basic** ($99/mo) - Essential features\n• **Pro** ($199/mo) - Security + Analytics\n• **Enterprise** ($399/mo) - Full platform access\n\nWould you like to explore upgrade options or need help with billing?",
-        'compliance': "**Compliance Reporting Features:**\n\n📋 **Available Reports:**\n• HIPAA compliance status\n• Data security audit logs\n• Patient privacy controls\n• Staff access monitoring\n\n**To generate reports:**\n1. Security Suite → Compliance\n2. Select report type and date range\n3. Download PDF or schedule automated reports\n\nNeed help with specific compliance requirements?"
-      },
-      supplier: {
-        'tender': "**Bidding on Healthcare Tenders:**\n\n**Step-by-step process:**\n1. **Browse active tenders** in the Marketplace\n2. **Review requirements** and eligibility criteria\n3. **Prepare your proposal** with required documents\n4. **Submit application** before deadline\n5. **Track status** in your supplier dashboard\n\n**Required Documents:**\n• Company registration\n• Product certifications (FDA, CE, etc.)\n• Clinical trial data (if applicable)\n• Insurance certificates\n\nWould you like help with a specific tender or document requirements?",
-        'upload': "**Document Upload Process:**\n\n📁 **Accepted File Types:**\n• PDF, DOC, DOCX for reports\n• JPG, PNG for certificates\n• XLS, XLSX for data sheets\n\n**Required Documents:**\n• **COA** (Certificate of Analysis)\n• **Clinical trial data**\n• **Safety reports**\n• **Regulatory approvals**\n\n**To upload:**\n1. Supplier Dashboard → Documents\n2. Select document type\n3. Upload and add description\n4. Submit for verification\n\nNeed help with specific document requirements?",
-        'rfp': "**Active RFPs (Request for Proposals):**\n\nYou can find current opportunities by:\n\n🔍 **Filtering by:**\n• Drug category\n• Geographic region\n• Budget range\n• Deadline proximity\n\n📊 **Tender Categories:**\n• Medical equipment\n• Pharmaceuticals\n• Laboratory services\n• Medical supplies\n\nCheck the Marketplace section for the latest opportunities. Would you like help finding tenders in a specific category?",
-        'contact': "**Contacting Healthcare Providers:**\n\n💬 **Communication Options:**\n• **Direct messaging** through platform\n• **Proposal submissions** for active tenders\n• **Follow-up messages** after applications\n\n**Best Practices:**\n• Be professional and concise\n• Include relevant certifications\n• Respond promptly to inquiries\n• Follow up appropriately\n\nRemember: Initial contact should be through tender applications or the messaging system. Need help crafting a professional message?"
-      }
-    };
-
-    const roleResponses = responses[role as keyof typeof responses];
-    const lowerMessage = message.toLowerCase();
-    
-    for (const [key, response] of Object.entries(roleResponses)) {
-      if (lowerMessage.includes(key)) {
-        return response;
-      }
-    }
-
-    // Default responses
-    const defaultResponses = {
-      patient: "I'm here to help you with healthcare-related questions! You can ask me about finding clinics, booking appointments, health information, or navigating our platform. What would you like to know?",
-      clinic: "I can assist you with platform features, security settings, analytics, subscription management, and compliance requirements. How can I help you today?",
-      supplier: "I'm here to help you navigate the healthcare marketplace, understand tender processes, and connect with healthcare providers. What specific information do you need?"
-    };
-
-    return defaultResponses[role as keyof typeof defaultResponses] || defaultResponses.patient;
-  };
-
   const handleSendMessage = async () => {
     if (!inputMessage.trim()) return;
 
@@ -118,15 +74,23 @@ const GeminiChatbot = () => {
     setIsLoading(true);
 
     try {
-      const response = await simulateGeminiResponse(inputMessage, userRole || 'patient');
-      
+      // Call backend chatbot endpoint
+      const response = await fetch('http://localhost:5000/api/clinic/chatbot/message', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: inputMessage })
+      });
+      const data = await response.json();
+      let botContent = "I'm sorry, I'm having trouble responding right now. Please try again in a moment.";
+      if (data && data.success && data.data && data.data.message) {
+        botContent = data.data.message;
+      }
       const botMessage: ChatMessage = {
         id: (Date.now() + 1).toString(),
-        content: response,
+        content: botContent,
         role: 'assistant',
         timestamp: new Date()
       };
-
       setMessages(prev => [...prev, botMessage]);
     } catch (error) {
       console.error('Chat error:', error);

@@ -98,9 +98,20 @@ const DoctorProfile: React.FC<DoctorProfileProps> = ({ doctor }) => {
     pendingPayouts: 15000
   };
 
-  const handleSave = () => {
-    console.log('Saving doctor data:', editData);
-    setIsEditing(false);
+  const handleSave = async () => {
+    try {
+      const response = await fetch(`http://localhost:5000/profile/${editData.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(editData),
+        credentials: 'include',
+      });
+      if (!response.ok) throw new Error('Failed to update profile');
+      setIsEditing(false);
+      alert('Profile updated successfully!');
+    } catch (error) {
+      alert('Error updating profile. Please try again.');
+    }
   };
 
   const handleCancel = () => {
