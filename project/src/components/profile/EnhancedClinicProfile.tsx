@@ -141,7 +141,7 @@ const EnhancedClinicProfile: React.FC<EnhancedClinicProfileProps> = ({ clinic })
         credentials: 'include',
       });
       if (!response.ok) throw new Error('Failed to update profile');
-      setIsEditing(false);
+    setIsEditing(false);
       alert('Profile updated successfully!');
     } catch (error) {
       alert('Error updating profile. Please try again.');

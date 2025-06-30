@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, MapPin, Calendar, Star, Filter, Clock, Phone, Navigation, Heart, Shield, Award, Users, ChevronDown, SlidersHorizontal, X } from 'lucide-react';
+import logo2 from '../assets/logo2.png';
 
 const ClinicSearchPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
