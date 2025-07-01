@@ -6,10 +6,9 @@ interface ClinicLicensingProps {
   formData: any;
   setFormData: (data: any) => void;
   errors: Record<string, string>;
-  firstInputRef?: React.RefObject<HTMLInputElement>;
 }
 
-const ClinicLicensing: React.FC<ClinicLicensingProps> = ({ formData, setFormData, errors, firstInputRef }) => {
+const ClinicLicensing: React.FC<ClinicLicensingProps> = ({ formData, setFormData, errors }) => {
   const algerianCities = [
     'Algiers', 'Oran', 'Constantine', 'Annaba', 'Blida', 'Batna', 'Djelfa', 'Sétif',
     'Sidi Bel Abbès', 'Biskra', 'Tébessa', 'El Oued', 'Skikda', 'Tiaret', 'Béjaïa',
@@ -48,7 +47,6 @@ const ClinicLicensing: React.FC<ClinicLicensingProps> = ({ formData, setFormData
             Street Address *
           </label>
           <input
-            ref={firstInputRef}
             type="text"
             required
             value={formData.clinicAddress?.street || ''}

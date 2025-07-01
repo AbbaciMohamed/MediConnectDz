@@ -47,60 +47,43 @@ const DoctorProfile: React.FC<DoctorProfileProps> = ({ doctor }) => {
     { id: 'security', label: 'Security & Access', icon: Shield }
   ];
 
-  const mockAppointments = [
-    {
-      id: '1',
-      date: new Date('2025-01-15'),
-      time: '10:00 AM',
-      patient: 'Amina Boudiaf',
-      clinic: 'Algiers Medical Center',
-      type: 'General Consultation',
-      status: 'scheduled',
-      fee: 5000
-    },
-    {
-      id: '2',
-      date: new Date('2025-01-15'),
-      time: '2:30 PM',
-      patient: 'Karim Benali',
-      clinic: 'Algiers Medical Center',
-      type: 'Follow-up',
-      status: 'scheduled',
-      fee: 3500
-    }
-  ];
 
-  const mockPastConsultations = [
-    {
-      id: '1',
-      date: new Date('2025-01-10'),
-      patient: 'Fatima Cherif',
-      clinic: 'Algiers Medical Center',
-      type: 'General Consultation',
-      fee: 5000,
-      summary: 'Routine checkup completed. Patient in good health.'
-    },
-    {
-      id: '2',
-      date: new Date('2025-01-08'),
-      patient: 'Omar Benaissa',
-      clinic: 'Cardiology Clinic Oran',
-      type: 'Cardiology Consultation',
-      fee: 8000,
-      summary: 'ECG performed. Recommended lifestyle changes.'
-    }
-  ];
+  const [appointments, setAppointments] = useState<any[]>([]);
+  const [pastConsultations, setPastConsultations] = useState<any[]>([]);
+  const [earnings, setEarnings] = useState({ thisMonth: 0, lastMonth: 0, totalEarnings: 0, pendingPayouts: 0 });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const mockEarnings = {
-    thisMonth: 125000,
-    lastMonth: 98500,
-    totalEarnings: 1250000,
-    pendingPayouts: 15000
-  };
+  React.useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        // Fetch appointments (upcoming and past)
+        const res = await fetch(`/api/appointments?doctorId=${doctor.id}`, { credentials: 'include' });
+        if (!res.ok) throw new Error('Failed to fetch appointments');
+        const data = await res.json();
+        setAppointments(data.upcoming || []);
+        setPastConsultations(data.past || []);
+
+        // Fetch earnings (if available)
+        const resEarnings = await fetch(`/api/analytics/earnings?doctorId=${doctor.id}`, { credentials: 'include' });
+        if (resEarnings.ok) {
+          const earn = await resEarnings.json();
+          setEarnings(earn);
+        }
+      } catch (err: any) {
+        setError(err.message || 'Error loading data');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, [doctor.id]);
 
   const handleSave = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/profile/${editData.id}`, {
+      const response = await fetch(`/api/profile/${editData.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(editData),
@@ -458,7 +441,7 @@ const DoctorProfile: React.FC<DoctorProfileProps> = ({ doctor }) => {
             <span className="text-green-600 text-sm font-inter font-medium">+15%</span>
           </div>
           <h3 className="text-2xl font-jakarta font-bold text-neutral-900 mb-1">
-            {mockEarnings.thisMonth.toLocaleString()} DZD
+            {earnings.thisMonth.toLocaleString()} DZD
           </h3>
           <p className="text-gray-600 font-inter">This Month</p>
         </div>
@@ -469,7 +452,7 @@ const DoctorProfile: React.FC<DoctorProfileProps> = ({ doctor }) => {
             <span className="text-blue-600 text-sm font-inter font-medium">Last Month</span>
           </div>
           <h3 className="text-2xl font-jakarta font-bold text-neutral-900 mb-1">
-            {mockEarnings.lastMonth.toLocaleString()} DZD
+            {earnings.lastMonth.toLocaleString()} DZD
           </h3>
           <p className="text-gray-600 font-inter">Previous Period</p>
         </div>
@@ -480,7 +463,7 @@ const DoctorProfile: React.FC<DoctorProfileProps> = ({ doctor }) => {
             <span className="text-primary text-sm font-inter font-medium">Total</span>
           </div>
           <h3 className="text-2xl font-jakarta font-bold text-neutral-900 mb-1">
-            {mockEarnings.totalEarnings.toLocaleString()} DZD
+            {earnings.totalEarnings.toLocaleString()} DZD
           </h3>
           <p className="text-gray-600 font-inter">All Time</p>
         </div>
@@ -491,7 +474,7 @@ const DoctorProfile: React.FC<DoctorProfileProps> = ({ doctor }) => {
             <span className="text-yellow-600 text-sm font-inter font-medium">Pending</span>
           </div>
           <h3 className="text-2xl font-jakarta font-bold text-neutral-900 mb-1">
-            {mockEarnings.pendingPayouts.toLocaleString()} DZD
+            {earnings.pendingPayouts.toLocaleString()} DZD
           </h3>
           <p className="text-gray-600 font-inter">Pending Payout</p>
         </div>
@@ -501,7 +484,7 @@ const DoctorProfile: React.FC<DoctorProfileProps> = ({ doctor }) => {
       <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
         <h3 className="text-xl font-jakarta font-semibold text-neutral-900 mb-6">Upcoming Appointments</h3>
         <div className="space-y-4">
-          {mockAppointments.map((appointment) => (
+          {appointments.map((appointment) => (
             <div key={appointment.id} className="border border-gray-200 rounded-lg p-6">
               <div className="flex items-center justify-between mb-4">
                 <div>
@@ -540,7 +523,7 @@ const DoctorProfile: React.FC<DoctorProfileProps> = ({ doctor }) => {
       <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
         <h3 className="text-xl font-jakarta font-semibold text-neutral-900 mb-6">Past Consultations</h3>
         <div className="space-y-4">
-          {mockPastConsultations.map((consultation) => (
+          {pastConsultations.map((consultation) => (
             <div key={consultation.id} className="border border-gray-200 rounded-lg p-6">
               <div className="flex items-center justify-between mb-3">
                 <h4 className="font-inter font-semibold text-gray-900">{consultation.type}</h4>

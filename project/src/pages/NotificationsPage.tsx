@@ -1,7 +1,16 @@
 import React, { useEffect, useState } from 'react';
 
+// Define a Notification type
+interface Notification {
+  _id: string;
+  type: string;
+  message: string;
+  createdAt: string;
+  read: boolean;
+}
+
 const NotificationsPage = () => {
-  const [notifications, setNotifications] = useState([]);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -10,23 +19,40 @@ const NotificationsPage = () => {
       setLoading(true);
       try {
         const res = await fetch('/api/notifications');
-        const data = await res.json();
+        if (!res.ok) {
+          setError('Failed to load notifications.');
+          console.error('Failed to fetch notifications:', res.statusText);
+          setLoading(false);
+          return;
+        }
+        const data: Notification[] = await res.json();
         setNotifications(data);
+        console.log('Notifications fetched successfully:', data);
       } catch (err) {
         setError('Failed to load notifications.');
+        console.error('Error fetching notifications:', err);
       }
       setLoading(false);
     };
     fetchNotifications();
   }, []);
 
-  const markAsRead = async (id) => {
-    await fetch('/api/notifications/read', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ notificationId: id })
-    });
-    setNotifications(notifications.map(n => n._id === id ? { ...n, read: true } : n));
+  const markAsRead = async (id: string) => {
+    try {
+      const res = await fetch('/api/notifications/read', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ notificationId: id })
+      });
+      if (!res.ok) {
+        console.error('Failed to mark notification as read:', res.statusText);
+        return;
+      }
+      console.log('Notification marked as read:', id);
+      setNotifications(notifications.map(n => n._id === id ? { ...n, read: true } : n));
+    } catch (err) {
+      console.error('Error marking notification as read:', err);
+    }
   };
 
   if (loading) return <div className="p-8 text-center">Loading notifications...</div>;

@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import * as React from 'react';
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Menu, X, Plus, Heart, MapPin, User, LogOut, Bell, Settings } from 'lucide-react';
+import { Menu, X, User, LogOut, Bell, Settings } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import LoginModal from './auth/LoginModal';
-import { useOrg } from '../contexts/OrgContext';
+// import logo from '../assets/logomain-removebg-preview.png';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -12,7 +13,6 @@ const Header = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const { orgBranding, orgName } = useOrg();
 
   const navItems = [
     { name: 'Home', href: '/' },
@@ -53,12 +53,9 @@ const Header = () => {
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
               >
-                <div className="relative">
-                  <Plus className="w-7 h-7 text-primary absolute top-0 left-0" />
-                  <Heart className="w-7 h-7 text-primary transform translate-x-2 translate-y-2" />
-                </div>
+                {/* <img src={logo} alt="Logo" className="h-10 w-10" /> */}
                 <span className="ml-4 text-2xl font-jakarta font-bold text-neutral-900">
-                  {orgName || 'HealthLand'}
+                  HealthLand
                 </span>
               </motion.div>
             </div>
@@ -76,16 +73,6 @@ const Header = () => {
                   }`}
                 >
                   {item.name}
-                  {item.name === 'Find Clinics' && (
-                    <motion.span 
-                      animate={{ scale: [1, 1.1, 1] }}
-                      transition={{ duration: 2, repeat: Infinity }}
-                      className="ml-2 inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800"
-                    >
-                      <div className="w-2 h-2 bg-green-500 rounded-full mr-1 animate-pulse"></div>
-                      ER Open
-                    </motion.span>
-                  )}
                   <span className={`absolute -bottom-1 left-0 h-0.5 bg-primary transition-all duration-300 ${
                     isActive(item.href) ? 'w-full' : 'w-0 group-hover:w-full'
                   }`}></span>
@@ -101,12 +88,12 @@ const Header = () => {
                       </div>
                       <div className="text-left">
                         <div className="text-sm font-inter font-semibold text-neutral-900">
-                          {user.role === 'patient' && (user.profile as any).firstName
-                            ? `${(user.profile as any).firstName} ${(user.profile as any).lastName}`
-                            : user.role === 'clinic' && (user.profile as any).name
-                            ? (user.profile as any).name
-                            : user.role === 'doctor' && (user.profile as any).firstName
-                            ? `Dr. ${(user.profile as any).firstName} ${(user.profile as any).lastName}`
+                          {user.role === 'patient' && typeof user.profile === 'object' && 'firstName' in user.profile && 'lastName' in user.profile
+                            ? `${(user.profile as { firstName: string; lastName: string }).firstName} ${(user.profile as { firstName: string; lastName: string }).lastName}`
+                            : user.role === 'clinic' && typeof user.profile === 'object' && 'name' in user.profile
+                            ? (user.profile as { name: string }).name
+                            : user.role === 'doctor' && typeof user.profile === 'object' && 'firstName' in user.profile && 'lastName' in user.profile
+                            ? `Dr. ${(user.profile as { firstName: string; lastName: string }).firstName} ${(user.profile as { firstName: string; lastName: string }).lastName}`
                             : user.email}
                         </div>
                         <div className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full font-inter font-medium w-fit">
@@ -143,10 +130,13 @@ const Header = () => {
                       Login
                     </button>
                     <motion.button
-                      onClick={() => setIsLoginModalOpen(true)}
+                      onClick={() => {
+                        navigate('/signup');
+                        setIsMenuOpen(false);
+                      }}
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
-                      className="bg-primary text-white px-6 py-3 rounded-xl font-inter font-semibold hover:bg-primary/90 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-primary/30 shadow-lg hover:shadow-xl"
+                      className="bg-primary text-white px-6 py-4 rounded-xl font-inter font-semibold hover:bg-primary/90 transition-colors duration-200 focus:outline-none focus:ring-4 focus:ring-primary/30 text-center"
                     >
                       Sign Up Free
                     </motion.button>
@@ -185,12 +175,6 @@ const Header = () => {
                     }`}
                   >
                     {item.name}
-                    {item.name === 'Find Clinics' && (
-                      <span className="ml-2 inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                        <div className="w-2 h-2 bg-green-500 rounded-full mr-1 animate-pulse"></div>
-                        ER Open
-                      </span>
-                    )}
                   </button>
                 ))}
                 
@@ -203,12 +187,12 @@ const Header = () => {
                         </div>
                         <div>
                           <div className="text-sm font-inter font-semibold text-neutral-900">
-                            {user.role === 'patient' && (user.profile as any).firstName
-                              ? `${(user.profile as any).firstName} ${(user.profile as any).lastName}`
-                              : user.role === 'clinic' && (user.profile as any).name
-                              ? (user.profile as any).name
-                              : user.role === 'doctor' && (user.profile as any).firstName
-                              ? `Dr. ${(user.profile as any).firstName} ${(user.profile as any).lastName}`
+                            {user.role === 'patient' && typeof user.profile === 'object' && 'firstName' in user.profile && 'lastName' in user.profile
+                              ? `${(user.profile as { firstName: string; lastName: string }).firstName} ${(user.profile as { firstName: string; lastName: string }).lastName}`
+                              : user.role === 'clinic' && typeof user.profile === 'object' && 'name' in user.profile
+                              ? (user.profile as { name: string }).name
+                              : user.role === 'doctor' && typeof user.profile === 'object' && 'firstName' in user.profile && 'lastName' in user.profile
+                              ? `Dr. ${(user.profile as { firstName: string; lastName: string }).firstName} ${(user.profile as { firstName: string; lastName: string }).lastName}`
                               : user.email}
                           </div>
                           <div className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full font-inter font-medium w-fit mt-1">
@@ -254,7 +238,7 @@ const Header = () => {
                       </button>
                       <button
                         onClick={() => {
-                          setIsLoginModalOpen(true);
+                          navigate('/signup');
                           setIsMenuOpen(false);
                         }}
                         className="bg-primary text-white px-6 py-4 rounded-xl font-inter font-semibold hover:bg-primary/90 transition-colors duration-200 focus:outline-none focus:ring-4 focus:ring-primary/30 text-center"
@@ -270,7 +254,9 @@ const Header = () => {
         </div>
       </header>
 
-      <LoginModal isOpen={isLoginModalOpen} onClose={() => setIsLoginModalOpen(false)} />
+      {isLoginModalOpen && (
+        <LoginModal isOpen={isLoginModalOpen} onClose={() => setIsLoginModalOpen(false)} />
+      )}
     </>
   );
 };

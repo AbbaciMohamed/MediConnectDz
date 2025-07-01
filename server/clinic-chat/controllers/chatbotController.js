@@ -17,70 +17,24 @@ const Message = require('../models/Message');
 const sendMessage = async (req, res) => {
   try {
     const { message } = req.body;
-    const userId = req.user?.id || req.ip;
-
     if (!message || typeof message !== 'string' || message.trim().length === 0) {
-      return res.status(400).json({
-        success: false,
-        error: 'Message is required and must be a non-empty string'
-      });
+      return res.status(400).json({ error: 'Message is required and must be a non-empty string' });
     }
-
-    // Store user message
-    await Message.create({
-      from: userId,
-      to: 'bot',
-      content: message,
-      timestamp: new Date(),
-      read: true
-    });
-
-    if (isEmergency(message)) {
-      const emergencyMsg = getEmergencyResponse();
-      // Store bot emergency response
-      await Message.create({
-        from: 'bot',
-        to: userId,
-        content: emergencyMsg,
-        timestamp: new Date(),
-        read: false
-      });
-      return res.status(200).json({
-        success: true,
-        data: {
-          message: emergencyMsg,
-          isEmergency: true,
-          timestamp: new Date().toISOString()
-        }
-      });
-    }
-
-    const response = await getChatbotResponse(message, userId);
-
-    // Store bot response
-    await Message.create({
-      from: 'bot',
-      to: userId,
-      content: response,
-      timestamp: new Date(),
-      read: false
-    });
-
-    res.status(200).json({
-      success: true,
-      data: {
-        message: response,
-        isEmergency: false,
-        timestamp: new Date().toISOString()
+    // Call OpenAI API
+    let reply;
+    try {
+      reply = await getChatbotResponse(message, req.ip);
+      if (!reply || typeof reply !== 'string') {
+        throw new Error('No reply from OpenAI');
       }
-    });
-
+      return res.status(200).json({ reply });
+    } catch (err) {
+      console.error('[Chatbot] OpenAI error:', err);
+      return res.status(500).json({ error: 'Chatbot failed', details: err.message });
+    }
   } catch (error) {
-    console.error('Chatbot Controller Error:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Internal server error. Please try again later.'
-    });
+    console.error('[Chatbot] Controller error:', error);
+    return res.status(500).json({ error: 'Chatbot failed', details: error.message });
   }
 };
 

@@ -23,7 +23,7 @@ if (process.env.OPENAI_API_KEY) {
 app.use(helmet());
 
 // CORS for React frontend (adjust origin as needed)
-app.use(cors({ origin: ['http://localhost:3000'], credentials: true }));
+app.use(cors({ origin: ['http://localhost:3000', 'http://localhost:5173'], credentials: true }));
 
 app.use(express.json());
 app.use(morgan('dev'));
@@ -59,6 +59,8 @@ app.use('/api/orgs', require('./clinic-chat/routes/orgs'));
 app.use('/api/notifications', require('./auth-profile/routes/notification'));
 app.use('/api/clinics/chatbot', require('./clinic-chat/routes/chatbot'));
 app.use('/api/auth', require('./auth-profile/routes/auth'));
+// Medical Document Q&A Scan feature
+
 
 app.use((req, res) => res.status(404).json({ message: 'Not Found' }));
 app.use((err, req, res, next) => {

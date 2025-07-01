@@ -5,7 +5,7 @@ interface AuthContextType {
   user: User | null;
   login: (email: string, password: string, rememberMe?: boolean) => Promise<void>;
   logout: () => void;
-  register: (userData: Partial<User>) => Promise<User>;
+  register: (userData: Partial<User>) => Promise<void>;
   isLoading: boolean;
   isEmailVerified: boolean;
   sendEmailVerification: (email: string) => Promise<void>;
@@ -21,16 +21,6 @@ export const useAuth = () => {
   }
   return context;
 };
-
-// Patch: extend User type for demo
-export interface DemoUser {
-  id?: string;
-  userId?: string;
-  name?: string;
-  email: string;
-  role: 'patient' | 'doctor' | 'clinic' | string;
-  [key: string]: any;
-}
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
@@ -78,18 +68,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
       if (!res.ok) throw new Error('Login failed');
       const data = await res.json();
-      setUser(data.user);
+      // TODO: Map backend response to User type as needed
+      // Example: setUser(data.user); localStorage.setItem('token', data.token);
       setIsEmailVerified(true);
-      localStorage.setItem('healthland_user', JSON.stringify(data.user));
-      if (data.token) {
-        if (rememberMe) {
-          localStorage.setItem('token', data.token);
-          localStorage.setItem('healthland_remember_me', 'true');
-        } else {
-          sessionStorage.setItem('token', data.token);
-          localStorage.setItem('healthland_remember_me', 'false');
-        }
-      }
     } catch (error) {
       throw new Error('Invalid email or password');
     } finally {
@@ -155,15 +136,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
       if (!res.ok) throw new Error('Registration failed');
       const data = await res.json();
-      // Accept demo user object with name or userId
-      const userObj = data.user || {};
-      setUser(userObj);
+      // TODO: Map backend response to User type as needed
+      // Example: setUser(data.user); localStorage.setItem('token', data.token);
       setIsEmailVerified(true);
-      localStorage.setItem('healthland_user', JSON.stringify(userObj));
-      if (data.token) {
-        localStorage.setItem('token', data.token);
-      }
-      return userObj;
     } catch (error) {
       throw new Error('Registration failed');
     } finally {

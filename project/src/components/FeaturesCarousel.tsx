@@ -1,78 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Calendar, MessageCircle, Shield, Clock, ArrowRight, Star, Users, Zap, CheckCircle, Award } from 'lucide-react';
-
-const features = [
-  {
-    icon: Calendar,
-    title: 'Smart Booking',
-    description: 'AI-powered appointment scheduling with real-time availability, automatic reminders, and seamless calendar integration.',
-    link: '#booking',
-    color: 'from-blue-500 to-blue-600',
-    stats: '10K+ bookings/month',
-    benefits: ['Real-time availability', 'Automatic reminders', 'Calendar sync']
-  },
-  {
-    icon: MessageCircle,
-    title: 'Secure Messaging',
-    description: 'HIPAA-compliant chat with healthcare providers, encrypted file sharing, and complete consultation history.',
-    link: '#messaging',
-    color: 'from-green-500 to-green-600',
-    stats: '99.9% uptime',
-    benefits: ['End-to-end encryption', 'File sharing', 'Chat history']
-  },
-  {
-    icon: Shield,
-    title: 'Advanced Security',
-    description: 'Bank-level encryption, biometric authentication, comprehensive audit trails, and GDPR compliance.',
-    link: '#privacy',
-    color: 'from-primary to-primary/80',
-    stats: 'Bank-level security',
-    benefits: ['Biometric auth', 'Audit trails', 'GDPR compliant']
-  },
-  {
-    icon: Clock,
-    title: '24/7 Emergency',
-    description: 'Instant access to emergency services, real-time ER wait times, urgent care locator, and priority booking.',
-    link: '#support',
-    color: 'from-red-500 to-red-600',
-    stats: '<2min response',
-    benefits: ['Emergency access', 'Real-time wait times', 'Priority booking']
-  },
-  {
-    icon: Users,
-    title: 'Family Care',
-    description: 'Manage health records for your entire family with shared calendars, notifications, and coordinated care.',
-    link: '#family',
-    color: 'from-purple-500 to-purple-600',
-    stats: '5 family members',
-    benefits: ['Family profiles', 'Shared calendars', 'Coordinated care']
-  },
-  {
-    icon: Zap,
-    title: 'AI Health Assistant',
-    description: 'Personalized health insights, medication reminders, symptom checker, and smart recommendations powered by AI.',
-    link: '#ai',
-    color: 'from-yellow-500 to-orange-500',
-    stats: 'Smart recommendations',
-    benefits: ['Health insights', 'Medication reminders', 'Symptom checker']
-  }
-];
+import { Calendar, MessageCircle, Shield, Clock, Users, Zap, CheckCircle, HeartPulse, Pill, Stethoscope, Activity, Brain } from 'lucide-react';
 
 const FeaturesCarousel = () => {
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [activeIndex, setActiveIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
-  const [visibleCards, setVisibleCards] = useState(3);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth >= 1024) {
-        setVisibleCards(3);
-      } else if (window.innerWidth >= 768) {
-        setVisibleCards(2);
-      } else {
-        setVisibleCards(1);
-      }
+      setIsMobile(window.innerWidth < 1024);
     };
     
     handleResize();
@@ -80,221 +17,311 @@ const FeaturesCarousel = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  const features = [
+    {
+      icon: Calendar,
+      title: 'Smart Booking',
+      description: 'AI-powered appointment scheduling with real-time availability and automatic reminders.',
+      stats: '10K+ bookings/month',
+      benefits: ['Real-time availability', 'Automatic reminders', 'Calendar sync'],
+      color: '#3b82f6'
+    },
+    {
+      icon: MessageCircle,
+      title: 'Secure Messaging',
+      description: 'HIPAA-compliant chat with healthcare providers and encrypted file sharing.',
+      stats: '99.9% uptime',
+      benefits: ['End-to-end encryption', 'File sharing', 'Chat history'],
+      color: '#14b8a6'
+    },
+    {
+      icon: Shield,
+      title: 'Advanced Security',
+      description: 'Bank-level encryption, biometric authentication, and GDPR compliance.',
+      stats: 'Bank-level security',
+      benefits: ['Biometric auth', 'Audit trails', 'GDPR compliant'],
+      color: '#6366f1'
+    },
+    {
+      icon: Clock,
+      title: '24/7 Emergency',
+      description: 'Instant access to emergency services and real-time ER wait times.',
+      stats: '<2min response',
+      benefits: ['Emergency access', 'Real-time wait times', 'Priority booking'],
+      color: '#f43f5e'
+    },
+    {
+      icon: Users,
+      title: 'Family Care',
+      description: 'Manage health records for your entire family with shared calendars.',
+      stats: '5 family members',
+      benefits: ['Family profiles', 'Shared calendars', 'Coordinated care'],
+      color: '#8b5cf6'
+    },
+    {
+      icon: Zap,
+      title: 'AI Health Assistant',
+      description: 'Personalized health insights and medication reminders powered by AI.',
+      stats: 'Smart recommendations',
+      benefits: ['Health insights', 'Medication reminders', 'Symptom checker'],
+      color: '#06b6d4'
+    }
+  ];
+
   useEffect(() => {
     if (!isHovered) {
       const interval = setInterval(() => {
-        setCurrentIndex((prevIndex) => (prevIndex + 1) % features.length);
+        setActiveIndex((prevIndex) => (prevIndex + 1) % features.length);
       }, 5000);
       return () => clearInterval(interval);
     }
   }, [isHovered]);
 
-  const getVisibleFeatures = () => {
-    const visible = [];
-    for (let i = 0; i < visibleCards; i++) {
-      visible.push(features[(currentIndex + i) % features.length]);
-    }
-    return visible;
+  const nextFeature = () => {
+    setActiveIndex((prevIndex) => (prevIndex + 1) % features.length);
+  };
+
+  const prevFeature = () => {
+    setActiveIndex((prevIndex) => (prevIndex - 1 + features.length) % features.length);
   };
 
   return (
-    <section className="py-20 bg-gradient-to-b from-white via-neutral-50 to-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-[#f0f9ff] to-[#e0f2fe] relative overflow-hidden">
+      {/* Floating background elements */}
+      <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0">
+        {[...Array(15)].map((_, i) => (
+          <motion.div
+            key={i}
+            className="absolute rounded-full opacity-10"
+            style={{
+              top: `${Math.random() * 100}%`,
+              left: `${Math.random() * 100}%`,
+              width: `${Math.random() * 200 + 50}px`,
+              height: `${Math.random() * 200 + 50}px`,
+              backgroundColor: features[activeIndex].color,
+            }}
+            animate={{
+              x: [0, Math.random() * 100 - 50],
+              y: [0, Math.random() * 100 - 50],
+            }}
+            transition={{
+              duration: Math.random() * 10 + 10,
+              repeat: Infinity,
+              repeatType: "reverse",
+            }}
+          />
+        ))}
+      </div>
+
+      {/* Medical symbols floating */}
+      <div className="absolute top-1/4 left-1/5 animate-float">
+        <HeartPulse className="w-10 h-10 text-blue-400/30" />
+      </div>
+      <div className="absolute top-1/3 right-1/3 animate-float-delay">
+        <Pill className="w-8 h-8 text-teal-400/30" />
+      </div>
+      <div className="absolute bottom-1/4 left-1/3 animate-float">
+        <Stethoscope className="w-12 h-12 text-indigo-400/30" />
+      </div>
+      <div className="absolute top-1/2 right-1/5 animate-float-delay">
+        <Activity className="w-9 h-9 text-rose-400/30" />
+      </div>
+      
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
+          animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
           className="text-center mb-16"
         >
-          <div className="inline-flex items-center bg-primary/10 text-primary px-6 py-3 rounded-full text-sm font-inter font-semibold mb-6 shadow-sm">
-            <Award className="w-4 h-4 mr-2" />
+          <div className="inline-flex items-center bg-blue-100 text-blue-600 px-6 py-3 rounded-full text-sm font-medium mb-6 shadow-sm">
+            <div className="w-4 h-4 mr-2 rounded-full bg-blue-600 animate-pulse" />
             Award-winning platform • Trusted by 50K+ patients
           </div>
-          <h2 className="text-4xl md:text-5xl font-jakarta font-bold text-neutral-900 mb-6">
-            Why Choose HealthLand?
+          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+            Transform Your <span className="text-blue-600">Healthcare Experience</span>
           </h2>
-          <p className="text-xl text-gray-600 font-inter max-w-3xl mx-auto leading-relaxed">
-            Experience healthcare the modern way with our comprehensive platform designed for your convenience, 
-            security, and peace of mind. Every feature is built with your health journey in mind.
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+            Our platform combines cutting-edge technology with compassionate care to deliver an unparalleled healthcare journey.
           </p>
         </motion.div>
 
-        {/* Desktop: Grid layout */}
-        <div className="hidden lg:grid lg:grid-cols-3 gap-8 mb-12">
-          {features.map((feature, index) => (
-            <motion.div
-              key={feature.title}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: index * 0.1 }}
-              whileHover={{ y: -12, scale: 1.02 }}
-              onHoverStart={() => setIsHovered(true)}
-              onHoverEnd={() => setIsHovered(false)}
-              className="group relative"
-            >
-              <div className="bg-white rounded-3xl p-8 shadow-lg hover:shadow-2xl transition-all duration-500 border border-gray-100 h-full relative overflow-hidden">
-                {/* Background gradient */}
-                <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${feature.color} opacity-5 rounded-full blur-2xl group-hover:opacity-10 transition-opacity duration-500`}></div>
-                
-                {/* Icon with gradient background */}
-                <div className={`bg-gradient-to-r ${feature.color} p-4 rounded-2xl mb-6 w-fit group-hover:scale-110 transition-transform duration-300 shadow-lg`}>
-                  <feature.icon className="w-8 h-8 text-white" />
-                </div>
-                
-                <div className="space-y-4 relative z-10">
-                  <h3 className="text-xl font-jakarta font-bold text-neutral-900 group-hover:text-primary transition-colors duration-300">
-                    {feature.title}
-                  </h3>
-                  <p className="text-gray-600 font-inter leading-relaxed">
-                    {feature.description}
-                  </p>
-                  
-                  {/* Benefits list */}
-                  <div className="space-y-2">
-                    {feature.benefits.map((benefit, idx) => (
-                      <div key={idx} className="flex items-center text-sm text-gray-600">
-                        <CheckCircle className="w-4 h-4 text-green-500 mr-2 flex-shrink-0" />
-                        <span className="font-inter">{benefit}</span>
-                      </div>
-                    ))}
-                  </div>
-                  
-                  {/* Stats badge */}
-                  <div className="inline-flex items-center bg-gray-100 text-gray-700 px-4 py-2 rounded-full text-sm font-inter font-semibold">
-                    <Star className="w-3 h-3 mr-1 text-yellow-500" />
-                    {feature.stats}
-                  </div>
-                  
-                  <a
-                    href={feature.link}
-                    className="inline-flex items-center text-primary font-inter font-semibold hover:text-primary/80 transition-colors duration-300 group-hover:translate-x-1 transform"
-                  >
-                    Learn More
-                    <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform duration-300" />
-                  </a>
-                </div>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-
-        {/* Mobile & Tablet: Carousel */}
-        <div className="lg:hidden">
-          <div className="overflow-hidden">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          {/* Left side - Visual representation */}
+          <div className="relative h-[500px]">
             <AnimatePresence mode="wait">
               <motion.div
-                key={currentIndex}
-                initial={{ opacity: 0, x: 100 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -100 }}
-                transition={{ duration: 0.5, ease: "easeInOut" }}
-                className={`grid gap-6 ${visibleCards === 2 ? 'grid-cols-2' : 'grid-cols-1'}`}
+                key={activeIndex}
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                transition={{ duration: 0.7 }}
+                className="absolute inset-0"
               >
-                {getVisibleFeatures().map((feature, index) => (
-                  <div
-                    key={`${feature.title}-${currentIndex}-${index}`}
-                    className="bg-white rounded-3xl p-6 shadow-lg border border-gray-100 relative overflow-hidden"
+                <div className="relative w-full h-full">
+                  {/* Main circle */}
+                  <div 
+                    className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 rounded-full flex items-center justify-center"
+                    style={{ backgroundColor: `${features[activeIndex].color}20` }}
                   >
-                    <div className={`absolute top-0 right-0 w-24 h-24 bg-gradient-to-br ${feature.color} opacity-5 rounded-full blur-xl`}></div>
-                    
-                    <div className={`bg-gradient-to-r ${feature.color} p-3 rounded-xl mb-4 w-fit shadow-md`}>
-                      <feature.icon className="w-6 h-6 text-white" />
-                    </div>
-                    
-                    <div className="space-y-3 relative z-10">
-                      <h3 className="text-lg font-jakarta font-bold text-neutral-900">
-                        {feature.title}
-                      </h3>
-                      <p className="text-gray-600 font-inter text-sm leading-relaxed">
-                        {feature.description}
-                      </p>
-                      
-                      <div className="space-y-1">
-                        {feature.benefits.slice(0, 2).map((benefit, idx) => (
-                          <div key={idx} className="flex items-center text-xs text-gray-600">
-                            <CheckCircle className="w-3 h-3 text-green-500 mr-2 flex-shrink-0" />
-                            <span className="font-inter">{benefit}</span>
-                          </div>
-                        ))}
+                    <div className="w-44 h-44 rounded-full flex items-center justify-center" 
+                         style={{ backgroundColor: `${features[activeIndex].color}40` }}>
+                      <div className="w-32 h-32 rounded-full flex items-center justify-center" 
+                           style={{ backgroundColor: `${features[activeIndex].color}60` }}>
+                        <div className="w-20 h-20 rounded-full flex items-center justify-center" 
+                             style={{ backgroundColor: features[activeIndex].color }}>
+                          {(() => {
+                            const Icon = features[activeIndex].icon;
+                            return <Icon className="w-10 h-10 text-white" />;
+                          })()}
+                        </div>
                       </div>
-                      
-                      <div className="inline-flex items-center bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-xs font-inter font-medium">
-                        <Star className="w-3 h-3 mr-1 text-yellow-500" />
-                        {feature.stats}
-                      </div>
-                      
-                      <a
-                        href={feature.link}
-                        className="inline-flex items-center text-primary font-inter font-semibold text-sm hover:text-primary/80 transition-colors duration-300"
-                      >
-                        Learn More
-                        <ArrowRight className="w-3 h-3 ml-1" />
-                      </a>
                     </div>
                   </div>
-                ))}
+                  
+                  {/* Floating elements */}
+                  {features[activeIndex].benefits.map((benefit, index) => {
+                    const angle = (index * 360 / features[activeIndex].benefits.length) * (Math.PI / 180);
+                    const radius = 180;
+                    const x = Math.cos(angle) * radius;
+                    const y = Math.sin(angle) * radius;
+                    
+                    return (
+                      <motion.div
+                        key={index}
+                        initial={{ opacity: 0, scale: 0.5 }}
+                        animate={{ 
+                          opacity: 1, 
+                          scale: 1,
+                          x: x,
+                          y: y,
+                        }}
+                        transition={{ 
+                          duration: 0.7,
+                          delay: index * 0.1 + 0.3
+                        }}
+                        className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
+                      >
+                        <div className="bg-white shadow-xl rounded-xl p-4 w-40 text-center">
+                          <CheckCircle className="w-5 h-5 mx-auto text-green-500 mb-2" />
+                          <p className="text-sm font-medium text-gray-700">{benefit}</p>
+                        </div>
+                      </motion.div>
+                    );
+                  })}
+                </div>
               </motion.div>
             </AnimatePresence>
           </div>
-
-          {/* Pagination dots */}
-          <div className="flex justify-center mt-8 space-x-2">
-            {features.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => setCurrentIndex(index)}
-                className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                  index === currentIndex 
-                    ? 'bg-primary w-8' 
-                    : 'bg-gray-300 hover:bg-gray-400'
-                }`}
-                aria-label={`Go to slide ${index + 1}`}
-              />
-            ))}
-          </div>
-        </div>
-
-        {/* Call to action */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8, delay: 0.3 }}
-          className="text-center mt-16"
-        >
-          <div className="bg-gradient-to-r from-primary to-primary/80 rounded-3xl p-8 md:p-12 text-white relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-secondary/20 opacity-50"></div>
-            <div className="relative z-10">
-              <h3 className="text-2xl md:text-3xl font-jakarta font-bold mb-4">
-                Ready to Transform Your Healthcare Experience?
-              </h3>
-              <p className="text-lg md:text-xl font-inter mb-8 opacity-90 max-w-2xl mx-auto">
-                Join thousands of patients who trust HealthLand for their healthcare needs. 
-                Start your journey to better health today.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="bg-white text-primary px-8 py-4 rounded-xl font-inter font-semibold text-lg hover:bg-gray-100 transition-colors duration-300 focus:outline-none focus:ring-4 focus:ring-white/30 shadow-lg"
+          
+          {/* Right side - Content */}
+          <div className="relative">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activeIndex}
+                initial={{ opacity: 0, x: 50 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -50 }}
+                transition={{ duration: 0.5 }}
+                className="bg-white/80 backdrop-blur-md rounded-3xl p-8 shadow-xl border border-gray-100"
+              >
+                <div className="flex items-start mb-6">
+                  <div 
+                    className="p-4 rounded-xl mr-4"
+                    style={{ backgroundColor: `${features[activeIndex].color}20` }}
+                  >
+                    {(() => {
+                      const Icon = features[activeIndex].icon;
+                      return <Icon className="w-8 h-8" style={{ color: features[activeIndex].color }} />;
+                    })()}
+                  </div>
+                  <div>
+                    <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                      {features[activeIndex].title}
+                    </h3>
+                    <div className="inline-flex items-center bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm font-medium">
+                      <div className="w-2 h-2 rounded-full mr-2" style={{ backgroundColor: features[activeIndex].color }}></div>
+                      {features[activeIndex].stats}
+                    </div>
+                  </div>
+                </div>
+                
+                <p className="text-gray-600 mb-8">
+                  {features[activeIndex].description}
+                </p>
+                
+                <div className="mb-8">
+                  <div className="flex items-center mb-4">
+                    <div className="h-0.5 flex-1 bg-gray-200"></div>
+                    <span className="px-4 text-gray-500 font-medium">Key Benefits</span>
+                    <div className="h-0.5 flex-1 bg-gray-200"></div>
+                  </div>
+                  
+                  <ul className="space-y-3">
+                    {features[activeIndex].benefits.map((benefit, index) => (
+                      <li key={index} className="flex items-center">
+                        <div 
+                          className="w-8 h-8 rounded-full flex items-center justify-center mr-3"
+                          style={{ backgroundColor: `${features[activeIndex].color}20` }}
+                        >
+                          <div className="w-2 h-2 rounded-full" style={{ backgroundColor: features[activeIndex].color }}></div>
+                        </div>
+                        <span className="text-gray-700">{benefit}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                
+                <button 
+                  className="w-full bg-gradient-to-r from-blue-600 to-cyan-600 text-white py-3 rounded-xl font-bold text-lg hover:opacity-90 transition-opacity duration-300 shadow-lg"
+                  style={{ boxShadow: `0 10px 25px -5px ${features[activeIndex].color}50` }}
                 >
-                  Get Started Free
-                </motion.button>
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="border-2 border-white text-white px-8 py-4 rounded-xl font-inter font-semibold text-lg hover:bg-white/10 transition-colors duration-300 focus:outline-none focus:ring-4 focus:ring-white/30"
-                >
-                  Watch Demo
-                </motion.button>
+                  Learn More
+                </button>
+              </motion.div>
+            </AnimatePresence>
+            
+            {/* Navigation */}
+            <div className="flex justify-between mt-8">
+              <button 
+                onClick={prevFeature}
+                className="bg-white p-3 rounded-full shadow-lg border border-gray-200 hover:bg-gray-50 transition-colors"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
+              
+              <div className="flex space-x-2">
+                {features.map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setActiveIndex(index)}
+                    className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                      index === activeIndex 
+                        ? 'bg-blue-600 w-8' 
+                        : 'bg-gray-300 hover:bg-gray-400'
+                    }`}
+                    style={{
+                      backgroundColor: index === activeIndex ? features[activeIndex].color : undefined
+                    }}
+                  />
+                ))}
               </div>
+              
+              <button 
+                onClick={nextFeature}
+                className="bg-white p-3 rounded-full shadow-lg border border-gray-200 hover:bg-gray-50 transition-colors"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
             </div>
           </div>
-        </motion.div>
+        </div>
       </div>
-    </section>
+    </div>
   );
 };
 

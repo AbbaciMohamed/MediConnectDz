@@ -306,31 +306,6 @@ const Testimonials = () => {
             ))}
           </div>
         </div>
-
-        {/* Call to action */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8, delay: 0.4 }}
-          className="text-center mt-16"
-        >
-          <div className="bg-gradient-to-r from-primary/5 to-secondary/5 rounded-3xl p-8">
-            <h3 className="text-2xl font-jakarta font-bold text-neutral-900 mb-4">
-              Join Our Community of Satisfied Patients
-            </h3>
-            <p className="text-lg text-gray-600 font-inter mb-6">
-              Experience the same quality care and exceptional service that our patients rave about.
-            </p>
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="bg-primary text-white px-8 py-4 rounded-xl font-inter font-semibold text-lg hover:bg-primary/90 transition-colors duration-300 focus:outline-none focus:ring-4 focus:ring-primary/30"
-            >
-              Start Your Journey Today
-            </motion.button>
-          </div>
-        </motion.div>
       </div>
     </section>
   );

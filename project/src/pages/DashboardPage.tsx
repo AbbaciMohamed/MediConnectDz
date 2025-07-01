@@ -1,6 +1,7 @@
 import React from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { Link } from 'react-router-dom';
+import PersonalWindow from '../components/user/PersonalWindow';
 
 const DashboardPage: React.FC = () => {
   const { user } = useAuth();
@@ -29,6 +30,7 @@ const DashboardPage: React.FC = () => {
             <p className="text-gray-500 mt-2">View and update your personal information.</p>
           </Link>
         </div>
+        <PersonalWindow />
       </div>
     </div>
   );

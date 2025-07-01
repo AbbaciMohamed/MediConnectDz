@@ -136,6 +136,14 @@ export interface Tender {
   status: 'open' | 'closed' | 'awarded';
   applicants: TenderApplication[];
   createdAt: Date;
+  // Added for UI compatibility with legacy/mock data and backend
+  clinicName?: string;
+  urgency?: string;
+  estimatedValue?: number;
+  location?: string;
+  contactPerson?: string;
+  submissionDeadline?: Date;
+  evaluationCriteria?: string[];
 }
 
 export interface TenderApplication {

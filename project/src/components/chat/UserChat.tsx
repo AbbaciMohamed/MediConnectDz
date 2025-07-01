@@ -10,7 +10,7 @@ const UserChat = ({ otherUserId, chatType }) => {
 
   useEffect(() => {
     const getRoom = async () => {
-      const res = await fetch('http://localhost:5000/chat/room', {
+      const res = await fetch('/api/chat/room', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId1: user.userId, userId2: otherUserId, type: chatType })
@@ -24,7 +24,7 @@ const UserChat = ({ otherUserId, chatType }) => {
   useEffect(() => {
     if (!roomId) return;
     const fetchMessages = async () => {
-      const res = await fetch(`http://localhost:5000/chat/messages/${roomId}`);
+      const res = await fetch(`/api/chat/messages/${roomId}`);
       const data = await res.json();
       setMessages(data);
     };
@@ -39,7 +39,7 @@ const UserChat = ({ otherUserId, chatType }) => {
 
   const sendMessage = async () => {
     if (!input.trim() || !roomId) return;
-    await fetch('http://localhost:5000/chat/message', {
+    await fetch('/api/chat/message', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ roomId, senderId: user.userId, content: input })

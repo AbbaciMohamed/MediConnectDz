@@ -6,10 +6,9 @@ interface ClinicServicesProps {
   formData: any;
   setFormData: (data: any) => void;
   errors: Record<string, string>;
-  firstInputRef?: React.RefObject<HTMLInputElement>;
 }
 
-const ClinicServices: React.FC<ClinicServicesProps> = ({ formData, setFormData, errors, firstInputRef }) => {
+const ClinicServices: React.FC<ClinicServicesProps> = ({ formData, setFormData, errors }) => {
   const medicalServices = [
     'General Medicine', 'Cardiology', 'Dermatology', 'Pediatrics', 'Orthopedics',
     'Neurology', 'Psychiatry', 'Emergency Care', 'Laboratory Services', 'Radiology',

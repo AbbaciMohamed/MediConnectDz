@@ -10,10 +10,9 @@ const GeminiChatbot = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [userRole, setUserRole] = useState<'patient' | 'clinic' | 'supplier' | null>(null);
+  const [userRole, setUserRole] = useState<'patient' | 'clinic' | 'supplier' | 'admin' | 'clinicStaff' | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { user } = useAuth();
-  const [error, setError] = useState('');
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -47,6 +46,16 @@ const GeminiChatbot = () => {
       'Upload clinical data',
       'View active RFPs',
       'Contact clinic directly'
+    ],
+    admin: [
+      'Manage users',
+      'View system logs',
+      'Update system settings'
+    ],
+    clinicStaff: [
+      'View booked appointments',
+      'Manage patient records',
+      'Update clinic schedule'
     ]
   };
 
@@ -54,23 +63,36 @@ const GeminiChatbot = () => {
     const prompts = {
       patient: "You are a helpful healthcare assistant for patients. Help them find clinics, book appointments, understand medical procedures, and provide general health information. Always recommend consulting with healthcare professionals for medical advice.",
       clinic: "You are a healthcare platform assistant for clinic administrators. Help them with platform features, security settings, analytics, subscription management, and compliance requirements.",
-      supplier: "You are a marketplace assistant for pharmaceutical suppliers. Help them understand the tender process, upload documents, find relevant opportunities, and connect with healthcare providers."
+      supplier: "You are a marketplace assistant for pharmaceutical suppliers. Help them understand the tender process, upload documents, find relevant opportunities, and connect with healthcare providers.",
+      admin: "You are a system administrator for the healthcare platform. Help with managing users, system logs, and settings.",
+      clinicStaff: "You are a clinic staff member. Help with managing patient records, booked appointments, and updating clinic schedule."
     };
     return prompts[role as keyof typeof prompts] || prompts.patient;
   };
 
-  const sendMessage = async () => {
+  const handleSendMessage = async () => {
     if (!inputMessage.trim()) return;
+
+    const newMessage: ChatMessage = {
+      id: Date.now().toString(),
+      content: inputMessage,
+      role: 'user',
+      timestamp: new Date(),
+      userId: user?.id
+    };
+
+    setMessages(prev => [...prev, newMessage]);
+    setInputMessage('');
     setIsLoading(true);
-    setError('');
-    setMessages(prev => [...prev, { id: Date.now().toString(), content: inputMessage, role: 'user', timestamp: new Date(), userId: user?.id }]);
+
     try {
-      const res = await fetch('/api/clinic/chatbot/message', {
+      // Call backend chatbot endpoint
+      const response = await fetch('http://localhost:5000/api/clinic/chatbot/message', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: inputMessage })
       });
-      const data = await res.json();
+      const data = await response.json();
       let botContent = "I'm sorry, I'm having trouble responding right now. Please try again in a moment.";
       if (data && data.success && data.data && data.data.message) {
         botContent = data.data.message;
@@ -79,15 +101,21 @@ const GeminiChatbot = () => {
         id: (Date.now() + 1).toString(),
         content: botContent,
         role: 'assistant',
-        timestamp: new Date(),
-        userId: user?.id
+        timestamp: new Date()
       };
       setMessages(prev => [...prev, botMessage]);
-    } catch (err) {
-      setError('Failed to get reply.');
+    } catch (error) {
+      console.error('Chat error:', error);
+      const errorMessage: ChatMessage = {
+        id: (Date.now() + 1).toString(),
+        content: "I'm sorry, I'm having trouble responding right now. Please try again in a moment.",
+        role: 'assistant',
+        timestamp: new Date()
+      };
+      setMessages(prev => [...prev, errorMessage]);
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
-    setInputMessage('');
   };
 
   const handleQuickReply = (reply: string) => {
@@ -238,13 +266,13 @@ const GeminiChatbot = () => {
                       type="text"
                       value={inputMessage}
                       onChange={(e) => setInputMessage(e.target.value)}
-                      onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
+                      onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
                       placeholder="Type your message..."
                       className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary font-inter text-sm"
                       disabled={isLoading}
                     />
                     <button
-                      onClick={sendMessage}
+                      onClick={handleSendMessage}
                       disabled={isLoading || !inputMessage.trim()}
                       className="bg-primary text-white p-2 rounded-lg hover:bg-primary/90 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary/30 disabled:opacity-50"
                       aria-label="Send message"

@@ -6,10 +6,9 @@ interface ClinicHoursProps {
   formData: any;
   setFormData: (data: any) => void;
   errors: Record<string, string>;
-  firstInputRef?: React.RefObject<HTMLInputElement>;
 }
 
-const ClinicHours: React.FC<ClinicHoursProps> = ({ formData, setFormData, errors, firstInputRef }) => {
+const ClinicHours: React.FC<ClinicHoursProps> = ({ formData, setFormData, errors }) => {
   const daysOfWeek = [
     { key: 'monday', label: 'Monday' },
     { key: 'tuesday', label: 'Tuesday' },

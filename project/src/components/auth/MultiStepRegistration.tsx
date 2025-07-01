@@ -1,25 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, ArrowRight, Check, Shield, Award } from 'lucide-react';
-import { useAuth } from '../../contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
-import RoleSelection from './steps/RoleSelection';
-import PatientBasicInfo from './steps/PatientBasicInfo';
-import PatientLocationPreferences from './steps/PatientLocationPreferences';
-import PatientTermsVerification from './steps/PatientTermsVerification';
-import SupplierContact from './steps/SupplierContact';
-import SupplierAddress from './steps/SupplierAddress';
-import SupplierCertifications from './steps/SupplierCertifications';
-import SupplierTerms from './steps/SupplierTerms';
-import ClinicAdmin from './steps/ClinicAdmin';
-import ClinicLicensing from './steps/ClinicLicensing';
-import ClinicServices from './steps/ClinicServices';
-import ClinicHours from './steps/ClinicHours';
-import ClinicTerms from './steps/ClinicTerms';
+import { Mail, User, CheckCircle, X } from 'lucide-react';
 
 interface RegistrationData {
-  role: 'patient' | 'clinic' | 'supplier' | null;
-  // Patient fields
+  role: string;
   firstName: string;
   lastName: string;
   email: string;
@@ -31,8 +15,6 @@ interface RegistrationData {
   agreeToTerms: boolean;
   receiveNewsletter: boolean;
   receiveSMS: boolean;
-  
-  // Supplier fields
   companyName: string;
   contactPerson: string;
   businessEmail: string;
@@ -46,8 +28,6 @@ interface RegistrationData {
   certifications: File[];
   website: string;
   linkedinUrl: string;
-  
-  // Clinic fields
   clinicName: string;
   administratorName: string;
   clinicEmail: string;
@@ -71,26 +51,69 @@ interface MultiStepRegistrationProps {
   onClose: () => void;
 }
 
-const MultiStepRegistration: React.FC<MultiStepRegistrationProps> = ({ isOpen, onClose }) => {
-  const [currentStep, setCurrentStep] = useState(1);
-  const [isLoading, setIsLoading] = useState(false);
-  const { register, user } = useAuth();
-  const firstInputRef = useRef<HTMLInputElement | null>(null);
-  const navigate = useNavigate();
-  const [error, setError] = useState<string | null>(null);
+const steps = [
+  'Account Info',
+  'Personal Info',
+  'Role Selection',
+  'Confirmation',
+];
+
+const roles = [
+  { label: 'Patient', value: 'patient' },
+  { label: 'Clinic', value: 'clinic' },
+  { label: 'Provider', value: 'provider' },
+];
+
+const MultiStepRegistration = ({ isOpen, onClose }: MultiStepRegistrationProps): JSX.Element | null => {
+  const [step, setStep] = useState(0);
+  const [form, setForm] = useState({
+    email: '',
+    password: '',
+    name: '',
+    phone: '',
+    role: '',
+  });
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   const [formData, setFormData] = useState<RegistrationData>({
-    role: null,
-    firstName: '', lastName: '', email: '', password: '', confirmPassword: '',
-    phone: '', location: '', dateOfBirth: '', agreeToTerms: false,
-    receiveNewsletter: false, receiveSMS: false, companyName: '',
-    contactPerson: '', businessEmail: '',
-    companyAddress: { street: '', city: '', postalCode: '', country: 'Algeria' },
-    drugCategories: [], certifications: [], website: '', linkedinUrl: '',
-    clinicName: '', administratorName: '', clinicEmail: '',
-    clinicAddress: { street: '', city: '', postalCode: '', country: 'Algeria' },
-    licenseNumber: '', licenseDocument: null,
-    servicesOffered: [], acceptedInsurance: [],
+    role: '',
+    firstName: '',
+    lastName: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
+    phone: '',
+    location: '',
+    dateOfBirth: '',
+    agreeToTerms: false,
+    receiveNewsletter: false,
+    receiveSMS: false,
+    companyName: '',
+    contactPerson: '',
+    businessEmail: '',
+    companyAddress: {
+      street: '',
+      city: '',
+      postalCode: '',
+      country: 'Algeria'
+    },
+    drugCategories: [],
+    certifications: [],
+    website: '',
+    linkedinUrl: '',
+    clinicName: '',
+    administratorName: '',
+    clinicEmail: '',
+    clinicAddress: {
+      street: '',
+      city: '',
+      postalCode: '',
+      country: 'Algeria'
+    },
+    licenseNumber: '',
+    licenseDocument: null,
+    servicesOffered: [],
+    acceptedInsurance: [],
     operatingHours: {
       monday: { open: '09:00', close: '17:00', isOpen: true },
       tuesday: { open: '09:00', close: '17:00', isOpen: true },
@@ -102,7 +125,6 @@ const MultiStepRegistration: React.FC<MultiStepRegistrationProps> = ({ isOpen, o
     }
   });
 
-  // Save/load from localStorage as before
   useEffect(() => {
     if (formData.role) {
       localStorage.setItem('healthland_registration_data', JSON.stringify(formData));
@@ -110,233 +132,279 @@ const MultiStepRegistration: React.FC<MultiStepRegistrationProps> = ({ isOpen, o
   }, [formData]);
 
   useEffect(() => {
-    const saved = localStorage.getItem('healthland_registration_data');
-    if (saved) {
+    const savedData = localStorage.getItem('healthland_registration_data');
+    if (savedData) {
       try {
-        const parsed = JSON.parse(saved);
-        setFormData(parsed);
-        if (parsed.role) setCurrentStep(2);
-      } catch {}
+        const parsedData = JSON.parse(savedData);
+        setFormData(parsedData);
+        if (parsedData.role) {
+          setStep(getCurrentStepFromData(parsedData));
+        }
+      } catch (error) {
+        console.error('Error loading saved registration data:', error);
+      }
     }
   }, []);
 
-  const getTotalSteps = () => {
-    if (formData.role === 'patient') return 4;
-    if (formData.role === 'supplier') return 5;
-    if (formData.role === 'clinic') return 6;
-    return 1;
+  const getCurrentStepFromData = (data: RegistrationData) => {
+    if (!data.role) return 1;
+    return 1; // Simplified step determination
   };
 
   const handleNext = () => {
-    const total = getTotalSteps();
-    if (currentStep < total) {
-      setCurrentStep(currentStep + 1);
-    } else {
-      handleSubmit();
-    }
+    if (validate()) setStep((s) => s + 1);
   };
 
-  const handleBack = () => {
-    if (currentStep > 1) setCurrentStep(currentStep - 1);
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+    setErrors({ ...errors, [e.target.name]: '' });
+  };
+
+  const handleRoleSelect = (role: string) => {
+    setForm({ ...form, role });
+    setErrors({ ...errors, role: '' });
   };
 
   const handleSubmit = async () => {
-    setIsLoading(true);
-    setError(null);
+    if (!validate()) return;
     try {
-      const registrationData: any = {
+      const registrationData: Record<string, string> = {
         userId: (formData.email || formData.clinicEmail || formData.businessEmail || '').toLowerCase(),
-        name: formData.clinicName || `${formData.firstName} ${formData.lastName}` || formData.companyName || '',
+        name: formData.clinicName || (formData.firstName + ' ' + formData.lastName) || formData.companyName || '',
         email: formData.role === 'supplier' ? formData.businessEmail : formData.role === 'clinic' ? formData.clinicEmail : formData.email,
         password: formData.password,
-        role: formData.role,
+        role: formData.role
       };
       if (formData.role === 'clinic') {
-        registrationData.subscriptionPlan = 'trial';
-        registrationData.subscriptionDuration = '14';
+        registrationData['subscriptionPlan'] = 'trial';
+        registrationData['subscriptionDuration'] = '14';
       }
-      const registeredUser = await register({ ...registrationData });
+      const form = new FormData();
+      Object.keys(registrationData).forEach(key => {
+        form.append(key, registrationData[key]);
+      });
+      if (formData.role === 'clinic' && formData.licenseDocument) {
+        form.append('certificate', formData.licenseDocument);
+      }
+      const response = await fetch('http://localhost:5000/auth/register', {
+        method: 'POST',
+        body: form,
+      });
+      let responseData = {};
+      const text = await response.text();
+      try {
+        responseData = text ? JSON.parse(text) : {};
+      } catch {
+        responseData = {};
+      }
+      if (!response.ok) {
+        const errorMsg = (responseData && typeof responseData === 'object' && 'message' in responseData)
+          ? (responseData as { message: string }).message
+          : 'Registration failed';
+        throw new Error(errorMsg);
+      }
       localStorage.removeItem('healthland_registration_data');
       onClose();
-      navigate('/dashboard');
-    } catch (err: any) {
-      setError(err.message || 'Registration failed');
-    } finally {
-      setIsLoading(false);
+    } catch (error) {
+      console.error('Registration error:', error);
     }
   };
 
+  const validate = () => {
+    const errs: { [key: string]: string } = {};
+    if (step === 0) {
+      if (!form.email) errs.email = 'Email is required';
+      if (!form.password) errs.password = 'Password is required';
+    }
+    if (step === 1) {
+      if (!form.name) errs.name = 'Name is required';
+      if (!form.phone) errs.phone = 'Phone is required';
+    }
+    if (step === 2) {
+      if (!form.role) errs.role = 'Please select a role';
+    }
+    setErrors(errs);
+    return Object.keys(errs).length === 0;
+  };
+
   const renderCurrentStep = () => {
-    if (currentStep === 1) {
-      return <RoleSelection selectedRole={formData.role} onRoleSelect={role => setFormData({ ...formData, role })} errors={{}} />;
+    if (step === 0) {
+      return (
+        <motion.div
+          key="account"
+          initial={{ opacity: 0, x: 40 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: -40 }}
+          transition={{ duration: 0.4 }}
+        >
+          <h2 className="text-2xl font-bold mb-6 text-primary flex items-center"><Mail className="w-5 h-5 mr-2" /> Account Info</h2>
+          <div className="mb-4">
+            <label className="block text-sm font-medium mb-1">Email</label>
+            <input
+              type="email"
+              name="email"
+              value={form.email}
+              onChange={handleChange}
+              className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 font-inter ${errors.email ? 'border-red-400' : 'border-gray-300'}`}
+              placeholder="you@email.com"
+            />
+            {errors.email && <div className="text-red-500 text-xs mt-1">{errors.email}</div>}
+          </div>
+          <div className="mb-6">
+            <label className="block text-sm font-medium mb-1">Password</label>
+            <input
+              type="password"
+              name="password"
+              value={form.password}
+              onChange={handleChange}
+              className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 font-inter ${errors.password ? 'border-red-400' : 'border-gray-300'}`}
+              placeholder="Create a password"
+            />
+            {errors.password && <div className="text-red-500 text-xs mt-1">{errors.password}</div>}
+          </div>
+          <button
+            onClick={handleNext}
+            className="w-full bg-primary text-white py-3 rounded-xl font-semibold hover:bg-primary/90 transition-colors duration-200"
+          >
+            Next
+          </button>
+        </motion.div>
+      );
     }
-    if (formData.role === 'patient') {
-      if (currentStep === 2) return <PatientBasicInfo formData={formData} setFormData={setFormData} errors={{}} firstInputRef={firstInputRef} />;
-      if (currentStep === 3) return <PatientLocationPreferences formData={formData} setFormData={setFormData} errors={{}} firstInputRef={firstInputRef} />;
-      if (currentStep === 4) return <PatientTermsVerification formData={formData} setFormData={setFormData} errors={{}} firstInputRef={firstInputRef} />;
+
+    if (step === 1) {
+      return (
+        <motion.div
+          key="personal"
+          initial={{ opacity: 0, x: 40 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: -40 }}
+          transition={{ duration: 0.4 }}
+        >
+          <h2 className="text-2xl font-bold mb-6 text-primary flex items-center"><User className="w-5 h-5 mr-2" /> Personal Info</h2>
+          <div className="mb-4">
+            <label className="block text-sm font-medium mb-1">Full Name</label>
+            <input
+              type="text"
+              name="name"
+              value={form.name}
+              onChange={handleChange}
+              className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 font-inter ${errors.name ? 'border-red-400' : 'border-gray-300'}`}
+            />
+            {errors.name && <div className="text-red-500 text-xs mt-1">{errors.name}</div>}
+          </div>
+          <div className="mb-4">
+            <label className="block text-sm font-medium mb-1">Phone</label>
+            <input
+              type="text"
+              name="phone"
+              value={form.phone}
+              onChange={handleChange}
+              className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 font-inter ${errors.phone ? 'border-red-400' : 'border-gray-300'}`}
+            />
+            {errors.phone && <div className="text-red-500 text-xs mt-1">{errors.phone}</div>}
+          </div>
+          <button
+            onClick={handleNext}
+            className="w-full bg-primary text-white py-3 rounded-xl font-semibold hover:bg-primary/90 transition-colors duration-200"
+          >
+            Next
+          </button>
+        </motion.div>
+      );
     }
-    if (formData.role === 'supplier') {
-      if (currentStep === 2) return <SupplierContact formData={formData} setFormData={setFormData} errors={{}} firstInputRef={firstInputRef} />;
-      if (currentStep === 3) return <SupplierAddress formData={formData} setFormData={setFormData} errors={{}} firstInputRef={firstInputRef} />;
-      if (currentStep === 4) return <SupplierCertifications formData={formData} setFormData={setFormData} errors={{}} firstInputRef={firstInputRef} />;
-      if (currentStep === 5) return <SupplierTerms formData={formData} setFormData={setFormData} errors={{}} firstInputRef={firstInputRef} />;
+
+    if (step === 2) {
+      return (
+        <motion.div
+          key="role"
+          initial={{ opacity: 0, x: 40 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: -40 }}
+          transition={{ duration: 0.4 }}
+        >
+          <h2 className="text-2xl font-bold mb-6 text-primary flex items-center"><User className="w-5 h-5 mr-2" /> Role Selection</h2>
+          <div className="mb-4">
+            <label className="block text-sm font-medium mb-1">Role</label>
+            <select
+              value={form.role}
+              onChange={(e) => handleRoleSelect(e.target.value)}
+              className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 font-inter ${errors.role ? 'border-red-400' : 'border-gray-300'}`}
+            >
+              <option value="">Select a role</option>
+              {roles.map((role) => (
+                <option key={role.value} value={role.value}>
+                  {role.label}
+                </option>
+              ))}
+            </select>
+            {errors.role && <div className="text-red-500 text-xs mt-1">{errors.role}</div>}
+          </div>
+          <button
+            onClick={handleNext}
+            className="w-full bg-primary text-white py-3 rounded-xl font-semibold hover:bg-primary/90 transition-colors duration-200"
+          >
+            Next
+          </button>
+        </motion.div>
+      );
     }
-    if (formData.role === 'clinic') {
-      if (currentStep === 2) return <ClinicAdmin formData={formData} setFormData={setFormData} errors={{}} firstInputRef={firstInputRef} />;
-      if (currentStep === 3) return <ClinicLicensing formData={formData} setFormData={setFormData} errors={{}} firstInputRef={firstInputRef} />;
-      if (currentStep === 4) return <ClinicServices formData={formData} setFormData={setFormData} errors={{}} firstInputRef={firstInputRef} />;
-      if (currentStep === 5) return <ClinicHours formData={formData} setFormData={setFormData} errors={{}} firstInputRef={firstInputRef} />;
-      if (currentStep === 6) return <ClinicTerms formData={formData} setFormData={setFormData} errors={{}} firstInputRef={firstInputRef} />;
+
+    if (step === 3) {
+      return (
+        <motion.div
+          key="confirmation"
+          initial={{ opacity: 0, x: 40 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: -40 }}
+          transition={{ duration: 0.4 }}
+        >
+          <h2 className="text-2xl font-bold mb-6 text-primary flex items-center"><CheckCircle className="w-5 h-5 mr-2" /> Confirmation</h2>
+          <p>Are you sure you want to submit this form?</p>
+          <button
+            onClick={handleSubmit}
+            className="w-full bg-primary text-white py-3 rounded-xl font-semibold hover:bg-primary/90 transition-colors duration-200"
+          >
+            Submit
+          </button>
+        </motion.div>
+      );
     }
+
     return null;
   };
 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
-        className="relative bg-white rounded-3xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden"
+        transition={{ type: 'spring', stiffness: 180, damping: 18 }}
+        className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md relative"
       >
-        {/* HEADER */}
-        <div className="bg-gradient-to-r from-primary to-primary/80 text-white p-8 sticky top-0 z-10">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-3xl font-bold">Create Your Account</h2>
-            <button onClick={onClose} className="p-2 hover:bg-white/20 rounded-lg">
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
-          <div className="flex items-center justify-between text-sm">
-            <span>Step {currentStep} of {getTotalSteps()}</span>
-            <span>{Math.round((currentStep / getTotalSteps()) * 100)}% Complete</span>
-          </div>
-          <div className="w-full bg-white/20 rounded-full h-2 mt-2">
-            <motion.div
-              className="bg-white h-2 rounded-full"
-              style={{ width: `${(currentStep / getTotalSteps()) * 100}%` }}
-            />
-          </div>
+        <button
+          onClick={onClose}
+          className="absolute top-3 right-3 text-gray-400 hover:text-primary text-xl font-bold focus:outline-none"
+          aria-label="Close registration modal"
+        >
+          <X className="w-6 h-6" />
+        </button>
+        {/* Progress Bar */}
+        <div className="flex items-center mb-8">
+          {steps.map((s, i) => (
+            <React.Fragment key={s}>
+              <div className={`flex-1 h-2 rounded-full ${i <= step ? 'bg-primary' : 'bg-gray-200'}`}></div>
+              {i < steps.length - 1 && <div className="w-4 h-4 flex items-center justify-center"><span className="block w-2 h-2 rounded-full bg-primary/30"></span></div>}
+            </React.Fragment>
+          ))}
         </div>
-
-        {/* BODY */}
-        <div className="flex-1 p-8 overflow-y-auto custom-scrollbar">
-          {error && (
-            <div className="mb-4 text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-2 text-sm">
-              {error}
-            </div>
-          )}
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={currentStep}
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.3 }}
-            >
-              {renderCurrentStep()}
-            </motion.div>
-          </AnimatePresence>
-
-          {/* Special highlights for different roles */}
-          {formData.role === 'clinic' && currentStep === 1 && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-              className="mt-8 p-6 bg-green-50 rounded-2xl border border-green-200"
-            >
-              <div className="flex items-center mb-4">
-                <Award className="w-6 h-6 text-green-600 mr-3" />
-                <h3 className="text-lg font-bold text-green-800">14-Day Free Trial</h3>
-              </div>
-              <div className="text-green-700">
-                <p className="mb-3"><strong>No credit card required!</strong> Get full access to all premium features:</p>
-                <ul className="space-y-2">
-                  <li className="flex items-center"><Check className="w-4 h-4 text-green-600 mr-2" />Security Medicine Suite</li>
-                  <li className="flex items-center"><Check className="w-4 h-4 text-green-600 mr-2" />Advanced Analytics Dashboard</li>
-                  <li className="flex items-center"><Check className="w-4 h-4 text-green-600 mr-2" />Premium Support & Training</li>
-                </ul>
-              </div>
-            </motion.div>
-          )}
-
-          {formData.role === 'supplier' && currentStep === 1 && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-              className="mt-8 p-6 bg-purple-50 rounded-2xl border border-purple-200"
-            >
-              <div className="flex items-center mb-4">
-                <Shield className="w-6 h-6 text-purple-600 mr-3" />
-                <h3 className="text-lg font-bold text-purple-800">Supplier Verification Program</h3>
-              </div>
-              <div className="text-purple-700">
-                <p className="mb-3">Join our trusted network of verified suppliers and gain access to:</p>
-                <ul className="space-y-2">
-                  <li className="flex items-center"><Check className="w-4 h-4 text-purple-600 mr-2" />Exclusive tender opportunities</li>
-                  <li className="flex items-center"><Check className="w-4 h-4 text-purple-600 mr-2" />Direct communication with clinics</li>
-                  <li className="flex items-center"><Check className="w-4 h-4 text-purple-600 mr-2" />Priority listing in marketplace</li>
-                </ul>
-              </div>
-            </motion.div>
-          )}
-        </div>
-
-        {/* FOOTER */}
-        <div className="bg-gray-50 px-8 py-6 border-t border-gray-200 sticky bottom-0 flex justify-between items-center">
-          <button
-            onClick={handleBack}
-            disabled={currentStep === 1}
-            className={`flex items-center px-6 py-3 rounded-xl font-medium transition-colors ${
-              currentStep === 1 
-                ? 'text-gray-400 cursor-not-allowed' 
-                : 'text-gray-700 hover:bg-gray-200'
-            }`}
-          >
-            <ArrowLeft className="w-5 h-5 mr-2" />
-            Back
-          </button>
-          
-          <div className="flex items-center space-x-2">
-            {currentStep > 1 && (
-              <span className="text-sm text-gray-500">
-                Step {currentStep} of {getTotalSteps()}
-              </span>
-            )}
-            <button
-              onClick={handleNext}
-              disabled={isLoading}
-              className="flex items-center bg-primary text-white px-6 py-3 rounded-xl font-medium hover:bg-primary-dark transition-colors disabled:opacity-70"
-            >
-              {isLoading ? (
-                <>
-                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  Processing...
-                </>
-              ) : (
-                <>
-                  {currentStep === getTotalSteps() ? 'Complete Registration' : 'Next Step'}
-                  {currentStep < getTotalSteps() && <ArrowRight className="w-5 h-5 ml-2" />}
-                </>
-              )}
-            </button>
-          </div>
-        </div>
+        <AnimatePresence mode="wait">
+          {renderCurrentStep()}
+        </AnimatePresence>
       </motion.div>
-      <style>{`
-        .custom-scrollbar::-webkit-scrollbar { width: 10px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #e0e7ef; border-radius: 8px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-      `}</style>
     </div>
   );
 };

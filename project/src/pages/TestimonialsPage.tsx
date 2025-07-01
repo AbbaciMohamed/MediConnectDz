@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Star, Quote, ChevronLeft, ChevronRight, Heart, MapPin, Calendar, Users, Award, TrendingUp, CheckCircle } from 'lucide-react';
+import { Star, Quote, ChevronLeft, ChevronRight, Heart, MapPin, Calendar, Users, TrendingUp, CheckCircle } from 'lucide-react';
 
-const TestimonialsPage = () => {
+const TestimonialsPage = ({ onRegister }: { onRegister?: () => void }) => {
   const [activeCategory, setActiveCategory] = useState('all');
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
+
+  const handleRegister = onRegister || (() => window.location.href = '/');
 
   const testimonials = [
     {
@@ -460,8 +462,9 @@ const TestimonialsPage = () => {
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <motion.button
                   whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="bg-white text-primary px-8 py-4 rounded-xl font-inter font-semibold text-lg hover:bg-gray-100 transition-colors duration-300 focus:outline-none focus:ring-4 focus:ring-white/30 shadow-lg"
+                  whileTap={{ scale: 0.97 }}
+                  className="bg-primary text-white px-8 py-4 rounded-xl font-inter font-semibold text-lg shadow-lg hover:bg-primary/90 transition-colors duration-200 mr-4"
+                  onClick={handleRegister}
                 >
                   Get Started Free
                 </motion.button>

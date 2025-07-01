@@ -1,51 +1,45 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Mail, Lock, Eye, EyeOff } from 'lucide-react';
-import MultiStepRegistration from './MultiStepRegistration';
+import { X, Mail, Lock, Eye, EyeOff, AlertCircle } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
-import ChatbotModal from '../chat/ChatbotModal';
+import MultiStepRegistration from './MultiStepRegistration';
 
 interface LoginModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
+
 const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
   const [isLogin, setIsLogin] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [showRegistration, setShowRegistration] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [isChatbotOpen, setIsChatbotOpen] = useState(false);
+  const { login } = useAuth();
 
   const [formData, setFormData] = useState({
     email: '',
     password: ''
   });
 
-  const { login } = useAuth();
-  const navigate = useNavigate();
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null);
+    
     if (!isLogin) {
       setShowRegistration(true);
       return;
     }
+
     setIsLoading(true);
+    setErrors({});
+    
     try {
       await login(formData.email, formData.password, rememberMe);
       onClose();
-      navigate('/dashboard');
     } catch (error) {
-      if (error instanceof Error) {
-        setError(error.message || 'Login failed');
-      } else {
-        setError('Login failed');
-      }
+      setErrors({ general: 'Invalid email or password. Please try again.' });
     } finally {
       setIsLoading(false);
     }
@@ -57,7 +51,12 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
   };
 
   if (showRegistration) {
-    return <MultiStepRegistration isOpen={true} onClose={handleCloseRegistration} />;
+    return (
+      <MultiStepRegistration 
+        isOpen={true} 
+        onClose={handleCloseRegistration}
+      />
+    );
   }
 
   return (
@@ -71,15 +70,6 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
             className="relative bg-white rounded-3xl shadow-2xl w-full max-w-md"
           >
             <div className="p-8">
-              {/* Chatbot Button */}
-              <button
-                onClick={() => setIsChatbotOpen(true)}
-                className="absolute top-4 right-16 bg-primary text-white px-3 py-1 rounded-lg font-inter text-sm shadow hover:bg-primary/90 transition-colors"
-                type="button"
-              >
-                Chatbot
-              </button>
-
               <div className="flex items-center justify-between mb-8">
                 <div>
                   <h2 className="text-3xl font-jakarta font-bold text-neutral-900">
@@ -89,14 +79,18 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
                     {isLogin ? 'Sign in to your account' : 'Create your account to get started'}
                   </p>
                 </div>
-                <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-lg transition-colors" title="Close">
+                <button
+                  onClick={onClose}
+                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                >
                   <X className="w-6 h-6" />
                 </button>
               </div>
 
-              {error && (
-                <div className="mb-4 text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-2 text-sm">
-                  {error}
+              {errors.general && (
+                <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center">
+                  <AlertCircle className="w-5 h-5 text-red-600 mr-3" />
+                  <p className="text-red-600 font-inter">{errors.general}</p>
                 </div>
               )}
 
@@ -158,7 +152,10 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
                         Remember me for 30 days
                       </label>
                     </div>
-                    <button type="button" className="text-sm font-inter text-primary hover:underline">
+                    <button
+                      type="button"
+                      className="text-sm font-inter text-primary hover:underline"
+                    >
                       Forgot password?
                     </button>
                   </div>
@@ -182,16 +179,14 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
 
               <div className="mt-8 text-center">
                 <button
-                  onClick={() => {
-                    setIsLogin(!isLogin);
-                    setFormData({ email: '', password: '' });
-                  }}
+                  onClick={() => setShowRegistration(true)}
                   className="text-primary font-inter font-medium hover:underline"
                 >
-                  {isLogin ? "Don't have an account? Sign up" : 'Already have an account? Sign in'}
+                  {"Don't have an account? Sign up"}
                 </button>
               </div>
 
+              {/* Demo Credentials */}
               {isLogin && (
                 <div className="mt-6 p-4 bg-gray-50 rounded-lg">
                   <h4 className="font-inter font-semibold text-gray-900 mb-2">Demo Accounts</h4>
@@ -203,8 +198,6 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
                 </div>
               )}
             </div>
-            {/* Chatbot Modal */}
-            <ChatbotModal isOpen={isChatbotOpen} onClose={() => setIsChatbotOpen(false)} />
           </motion.div>
         </div>
       )}

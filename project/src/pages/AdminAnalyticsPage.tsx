@@ -25,7 +25,7 @@ const AdminAnalyticsPage = () => {
         setRetention(r);
         setForecasts(f);
         setHeatmap(h);
-      } catch (err) {
+      } catch {
         setError('Failed to load analytics data.');
       }
       setLoading(false);

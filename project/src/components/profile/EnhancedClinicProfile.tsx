@@ -4,31 +4,23 @@ import {
   Building, 
   MapPin, 
   Users, 
-  Calendar, 
-  TrendingUp, 
   AlertTriangle,
   CheckCircle,
-  Clock,
-  Star,
   Settings,
   CreditCard,
   FileText,
   Shield,
   BarChart3,
-  DollarSign,
   Download,
   Eye,
   Edit3,
   Save,
   X,
-  Plus,
-  Trash2,
   Map,
   Phone,
   Mail,
   Globe,
-  Award,
-  Bell
+  Award
 } from 'lucide-react';
 import { ClinicProfile, SecurityScan, Invoice, PaymentMethod } from '../../types';
 
@@ -51,90 +43,50 @@ const EnhancedClinicProfile: React.FC<EnhancedClinicProfileProps> = ({ clinic })
     { id: 'account', label: 'Account & Security', icon: Settings }
   ];
 
-  const mockAnalytics = {
-    totalAppointments: 156,
-    appointmentGrowth: 12.5,
-    patientSatisfaction: 4.8,
-    averageWaitTime: 15,
-    revenueThisMonth: 45000,
-    revenueGrowth: 8.3,
-    noShowRate: 5.2
-  };
+  // const [analytics, setAnalytics] = useState<any>(null); // Not used currently
 
-  const mockSecurityScans: SecurityScan[] = [
-    {
-      id: '1',
-      clinicId: clinic.id,
-      scanType: 'vulnerability',
-      status: 'completed',
-      results: [
-        {
-          severity: 'medium',
-          category: 'Network Security',
-          description: 'Outdated firewall rules detected',
-          recommendation: 'Update firewall configuration',
-          affectedSystems: ['Main Network']
-        },
-        {
-          severity: 'low',
-          category: 'Software Updates',
-          description: 'Non-critical software updates available',
-          recommendation: 'Schedule maintenance window',
-          affectedSystems: ['Workstation-01', 'Workstation-03']
+// Remove unused icon imports to fix TS errors
+// Removed: Calendar, TrendingUp, Clock, Star, DollarSign, Plus, Trash2, Bell
+  const [securityScans, setSecurityScans] = useState<SecurityScan[]>([]);
+  const [invoices, setInvoices] = useState<Invoice[]>([]);
+  const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  React.useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        // Fetch security scans
+        const resScans = await fetch(`/api/clinics/${clinic.id}/security-scans`, { credentials: 'include' });
+        if (resScans.ok) {
+          setSecurityScans(await resScans.json());
         }
-      ],
-      scheduledAt: new Date('2025-01-10'),
-      completedAt: new Date('2025-01-10')
-    }
-  ];
 
-  const mockInvoices: Invoice[] = [
-    {
-      id: '1',
-      clinicId: clinic.id,
-      amount: 199,
-      status: 'paid',
-      dueDate: new Date('2025-01-01'),
-      paidDate: new Date('2024-12-28'),
-      items: [
-        { description: 'Pro Plan Subscription', amount: 199, period: 'January 2025' }
-      ],
-      downloadUrl: '/invoices/inv_001.pdf'
-    },
-    {
-      id: '2',
-      clinicId: clinic.id,
-      amount: 199,
-      status: 'pending',
-      dueDate: new Date('2025-02-01'),
-      items: [
-        { description: 'Pro Plan Subscription', amount: 199, period: 'February 2025' }
-      ],
-      downloadUrl: '/invoices/inv_002.pdf'
-    }
-  ];
+        // Fetch invoices
+        const resInvoices = await fetch(`/api/clinics/${clinic.id}/invoices`, { credentials: 'include' });
+        if (resInvoices.ok) {
+          setInvoices(await resInvoices.json());
+        }
 
-  const mockPaymentMethods: PaymentMethod[] = [
-    {
-      id: '1',
-      type: 'card',
-      last4: '4242',
-      brand: 'Visa',
-      isDefault: true,
-      expiryMonth: 12,
-      expiryYear: 2027
-    },
-    {
-      id: '2',
-      type: 'bank',
-      last4: '1234',
-      isDefault: false
-    }
-  ];
+        // Fetch payment methods
+        const resPayments = await fetch(`/api/clinics/${clinic.id}/payment-methods`, { credentials: 'include' });
+        if (resPayments.ok) {
+          setPaymentMethods(await resPayments.json());
+        }
+      } catch (err) {
+        setError((err as Error).message || 'Error loading data');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, [clinic.id]);
 
   const handleSave = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/profile/${editData.id}`, {
+      const response = await fetch(`/api/profile/${editData.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(editData),
@@ -143,7 +95,7 @@ const EnhancedClinicProfile: React.FC<EnhancedClinicProfileProps> = ({ clinic })
       if (!response.ok) throw new Error('Failed to update profile');
     setIsEditing(false);
       alert('Profile updated successfully!');
-    } catch (error) {
+    } catch {
       alert('Error updating profile. Please try again.');
     }
   };
@@ -424,44 +376,47 @@ const EnhancedClinicProfile: React.FC<EnhancedClinicProfileProps> = ({ clinic })
             Add Payment Method
           </button>
         </div>
-        
         <div className="space-y-4">
-          {mockPaymentMethods.map((method) => (
-            <div key={method.id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-              <div className="flex items-center space-x-4">
-                <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
-                  <CreditCard className="w-6 h-6 text-gray-600" />
-                </div>
-                <div>
-                  <h4 className="font-inter font-medium text-gray-900">
-                    {method.type === 'card' ? `${method.brand} ****${method.last4}` : `Bank ****${method.last4}`}
-                  </h4>
-                  <div className="flex items-center space-x-3">
-                    {method.type === 'card' && (
-                      <p className="text-sm text-gray-500">
-                        Expires {method.expiryMonth}/{method.expiryYear}
-                      </p>
-                    )}
-                    {method.isDefault && (
-                      <span className="bg-primary/10 text-primary px-2 py-1 rounded-full text-xs font-inter font-medium">
-                        Default
-                      </span>
-                    )}
+          {paymentMethods.length === 0 ? (
+            <div className="text-gray-500 font-inter">No payment methods found.</div>
+          ) : (
+            paymentMethods.map((method) => (
+              <div key={method.id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                <div className="flex items-center space-x-4">
+                  <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
+                    <CreditCard className="w-6 h-6 text-gray-600" />
+                  </div>
+                  <div>
+                    <h4 className="font-inter font-medium text-gray-900">
+                      {method.type === 'card' ? `${method.brand} ****${method.last4}` : `Bank ****${method.last4}`}
+                    </h4>
+                    <div className="flex items-center space-x-3">
+                      {method.type === 'card' && (
+                        <p className="text-sm text-gray-500">
+                          Expires {method.expiryMonth}/{method.expiryYear}
+                        </p>
+                      )}
+                      {method.isDefault && (
+                        <span className="bg-primary/10 text-primary px-2 py-1 rounded-full text-xs font-inter font-medium">
+                          Default
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
-              <div className="flex space-x-2">
-                {!method.isDefault && (
-                  <button className="text-primary hover:text-primary/80 font-inter text-sm">
-                    Set Default
+                <div className="flex space-x-2">
+                  {!method.isDefault && (
+                    <button className="text-primary hover:text-primary/80 font-inter text-sm">
+                      Set Default
+                    </button>
+                  )}
+                  <button className="text-red-600 hover:text-red-700 font-inter text-sm">
+                    Remove
                   </button>
-                )}
-                <button className="text-red-600 hover:text-red-700 font-inter text-sm">
-                  Remove
-                </button>
+                </div>
               </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
       </div>
 
@@ -480,68 +435,38 @@ const EnhancedClinicProfile: React.FC<EnhancedClinicProfileProps> = ({ clinic })
               </tr>
             </thead>
             <tbody>
-              {mockInvoices.map((invoice) => (
-                <tr key={invoice.id} className="border-b border-gray-100">
-                  <td className="py-3 px-4 font-inter">#{invoice.id}</td>
-                  <td className="py-3 px-4 font-inter">${invoice.amount}</td>
-                  <td className="py-3 px-4 font-inter">{invoice.dueDate.toLocaleDateString()}</td>
-                  <td className="py-3 px-4">
-                    <span className={`px-2 py-1 rounded-full text-sm font-inter ${
-                      invoice.status === 'paid' ? 'bg-green-100 text-green-800' :
-                      invoice.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                      'bg-red-100 text-red-800'
-                    }`}>
-                      {invoice.status}
-                    </span>
-                  </td>
-                  <td className="py-3 px-4">
-                    <div className="flex space-x-2">
-                      <button className="text-primary hover:text-primary/80 font-inter text-sm">
-                        <Eye className="w-4 h-4" />
-                      </button>
-                      <button className="text-primary hover:text-primary/80 font-inter text-sm">
-                        <Download className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
+              {invoices.length === 0 ? (
+                <tr><td colSpan={5} className="text-gray-500 font-inter py-4">No invoices found.</td></tr>
+              ) : (
+                invoices.map((invoice) => (
+                  <tr key={invoice.id} className="border-b border-gray-100">
+                    <td className="py-3 px-4 font-inter">#{invoice.id}</td>
+                    <td className="py-3 px-4 font-inter">${invoice.amount}</td>
+                    <td className="py-3 px-4 font-inter">{new Date(invoice.dueDate).toLocaleDateString()}</td>
+                    <td className="py-3 px-4">
+                      <span className={`px-2 py-1 rounded-full text-sm font-inter ${
+                        invoice.status === 'paid' ? 'bg-green-100 text-green-800' :
+                        invoice.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                        'bg-red-100 text-red-800'
+                      }`}>
+                        {invoice.status}
+                      </span>
+                    </td>
+                    <td className="py-3 px-4">
+                      <div className="flex space-x-2">
+                        <button className="text-primary hover:text-primary/80 font-inter text-sm">
+                          <Eye className="w-4 h-4" />
+                        </button>
+                        <button className="text-primary hover:text-primary/80 font-inter text-sm">
+                          <Download className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
-        </div>
-      </div>
-
-      {/* Billing History */}
-      <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
-        <h3 className="text-xl font-jakarta font-semibold text-neutral-900 mb-6">Billing History</h3>
-        <div className="space-y-4">
-          <div className="flex items-center justify-between p-4 bg-green-50 rounded-lg">
-            <div className="flex items-center space-x-4">
-              <CheckCircle className="w-8 h-8 text-green-600" />
-              <div>
-                <h4 className="font-inter font-medium text-gray-900">Payment Successful</h4>
-                <p className="text-sm text-gray-600">Pro Plan - January 2025</p>
-              </div>
-            </div>
-            <div className="text-right">
-              <p className="font-inter font-semibold text-gray-900">$199.00</p>
-              <p className="text-sm text-gray-500">Dec 28, 2024</p>
-            </div>
-          </div>
-
-          <div className="flex items-center justify-between p-4 bg-green-50 rounded-lg">
-            <div className="flex items-center space-x-4">
-              <CheckCircle className="w-8 h-8 text-green-600" />
-              <div>
-                <h4 className="font-inter font-medium text-gray-900">Payment Successful</h4>
-                <p className="text-sm text-gray-600">Pro Plan - December 2024</p>
-              </div>
-            </div>
-            <div className="text-right">
-              <p className="font-inter font-semibold text-gray-900">$199.00</p>
-              <p className="text-sm text-gray-500">Nov 28, 2024</p>
-            </div>
-          </div>
         </div>
       </div>
     </div>
@@ -554,15 +479,17 @@ const EnhancedClinicProfile: React.FC<EnhancedClinicProfileProps> = ({ clinic })
         <div className="text-center p-6 bg-green-50 rounded-xl">
           <CheckCircle className="w-12 h-12 text-green-600 mx-auto mb-3" />
           <h4 className="font-jakarta font-semibold text-neutral-900 mb-2">System Health</h4>
-          <p className="text-green-600 font-inter font-medium">Good</p>
+          <p className="text-green-600 font-inter font-medium">{securityScans.length === 0 ? 'Unknown' : 'Good'}</p>
         </div>
-        
         <div className="text-center p-6 bg-yellow-50 rounded-xl">
           <AlertTriangle className="w-12 h-12 text-yellow-600 mx-auto mb-3" />
           <h4 className="font-jakarta font-semibold text-neutral-900 mb-2">Vulnerabilities</h4>
-          <p className="text-yellow-600 font-inter font-medium">2 Medium</p>
+          <p className="text-yellow-600 font-inter font-medium">
+            {securityScans.length === 0
+              ? 'No recent scans'
+              : `${securityScans[0].results.filter(r => r.severity === 'medium' || r.severity === 'high').length} Medium/High`}
+          </p>
         </div>
-        
         <div className="text-center p-6 bg-blue-50 rounded-xl">
           <Shield className="w-12 h-12 text-blue-600 mx-auto mb-3" />
           <h4 className="font-jakarta font-semibold text-neutral-900 mb-2">Compliance</h4>
@@ -578,29 +505,32 @@ const EnhancedClinicProfile: React.FC<EnhancedClinicProfileProps> = ({ clinic })
             Run New Scan
           </button>
         </div>
-
         <div className="space-y-4">
-          {mockSecurityScans[0].results.map((result, index) => (
-            <div key={index} className="border border-gray-200 rounded-lg p-4">
-              <div className="flex items-start justify-between mb-2">
-                <div className="flex items-center space-x-3">
-                  <span className={`px-2 py-1 rounded text-xs font-inter font-medium ${
-                    result.severity === 'high' ? 'bg-red-100 text-red-800' :
-                    result.severity === 'medium' ? 'bg-yellow-100 text-yellow-800' :
-                    'bg-green-100 text-green-800'
-                  }`}>
-                    {result.severity.toUpperCase()}
-                  </span>
-                  <span className="text-sm text-gray-600 font-inter">{result.category}</span>
+          {securityScans.length === 0 ? (
+            <div className="text-gray-500 font-inter">No scan results found.</div>
+          ) : (
+            securityScans[0].results.map((result, index) => (
+              <div key={index} className="border border-gray-200 rounded-lg p-4">
+                <div className="flex items-start justify-between mb-2">
+                  <div className="flex items-center space-x-3">
+                    <span className={`px-2 py-1 rounded text-xs font-inter font-medium ${
+                      result.severity === 'high' ? 'bg-red-100 text-red-800' :
+                      result.severity === 'medium' ? 'bg-yellow-100 text-yellow-800' :
+                      'bg-green-100 text-green-800'
+                    }`}>
+                      {result.severity.toUpperCase()}
+                    </span>
+                    <span className="text-sm text-gray-600 font-inter">{result.category}</span>
+                  </div>
+                </div>
+                <h5 className="font-inter font-medium text-neutral-900 mb-2">{result.description}</h5>
+                <p className="text-sm text-gray-600 font-inter mb-2">{result.recommendation}</p>
+                <div className="text-xs text-gray-500 font-inter">
+                  Affected: {result.affectedSystems.join(', ')}
                 </div>
               </div>
-              <h5 className="font-inter font-medium text-neutral-900 mb-2">{result.description}</h5>
-              <p className="text-sm text-gray-600 font-inter mb-2">{result.recommendation}</p>
-              <div className="text-xs text-gray-500 font-inter">
-                Affected: {result.affectedSystems.join(', ')}
-              </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
       </div>
 
@@ -615,7 +545,6 @@ const EnhancedClinicProfile: React.FC<EnhancedClinicProfileProps> = ({ clinic })
             </div>
             <span className="text-sm text-gray-500">2 hours ago</span>
           </div>
-          
           <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
             <div>
               <h4 className="font-inter font-medium text-gray-900">User login</h4>
@@ -638,7 +567,6 @@ const EnhancedClinicProfile: React.FC<EnhancedClinicProfileProps> = ({ clinic })
               Generate Report
             </button>
           </div>
-          
           <div className="p-6 bg-gray-50 rounded-lg">
             <Shield className="w-8 h-8 text-primary mb-4" />
             <h4 className="font-inter font-semibold text-gray-900 mb-2">Security Assessment</h4>
@@ -665,41 +593,54 @@ const EnhancedClinicProfile: React.FC<EnhancedClinicProfileProps> = ({ clinic })
           </p>
         </div>
 
-        {/* Tab Navigation */}
-        <div className="border-b border-gray-200 mb-8">
-          <nav className="flex space-x-8 overflow-x-auto">
-            {tabs.map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center space-x-2 py-4 px-1 border-b-2 font-inter font-medium text-sm transition-colors whitespace-nowrap ${
-                  activeTab === tab.id
-                    ? 'border-primary text-primary'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                }`}
-              >
-                <tab.icon className="w-5 h-5" />
-                <span>{tab.label}</span>
-              </button>
-            ))}
-          </nav>
-        </div>
+        {/* Loading/Error States */}
+        {loading ? (
+          <div className="flex justify-center items-center h-64">
+            <span className="text-lg text-gray-500 font-inter">Loading...</span>
+          </div>
+        ) : error ? (
+          <div className="flex justify-center items-center h-64">
+            <span className="text-lg text-red-500 font-inter">{error}</span>
+          </div>
+        ) : (
+          <>
+            {/* Tab Navigation */}
+            <div className="border-b border-gray-200 mb-8">
+              <nav className="flex space-x-8 overflow-x-auto">
+                {tabs.map((tab) => (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`flex items-center space-x-2 py-4 px-1 border-b-2 font-inter font-medium text-sm transition-colors whitespace-nowrap ${
+                      activeTab === tab.id
+                        ? 'border-primary text-primary'
+                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    }`}
+                  >
+                    <tab.icon className="w-5 h-5" />
+                    <span>{tab.label}</span>
+                  </button>
+                ))}
+              </nav>
+            </div>
 
-        {/* Tab Content */}
-        <motion.div
-          key={activeTab}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3 }}
-        >
-          {activeTab === 'overview' && renderOverview()}
-          {activeTab === 'services' && <div>Services & Staff content coming soon...</div>}
-          {activeTab === 'subscription' && <div>Trial & Subscription content coming soon...</div>}
-          {activeTab === 'billing' && renderBilling()}
-          {activeTab === 'analytics' && <div>Analytics content coming soon...</div>}
-          {activeTab === 'security' && renderSecurity()}
-          {activeTab === 'account' && <div>Account & Security content coming soon...</div>}
-        </motion.div>
+            {/* Tab Content */}
+            <motion.div
+              key={activeTab}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              {activeTab === 'overview' && renderOverview()}
+              {activeTab === 'services' && <div>Services & Staff content coming soon...</div>}
+              {activeTab === 'subscription' && <div>Trial & Subscription content coming soon...</div>}
+              {activeTab === 'billing' && renderBilling()}
+              {activeTab === 'analytics' && <div>Analytics content coming soon...</div>}
+              {activeTab === 'security' && renderSecurity()}
+              {activeTab === 'account' && <div>Account & Security content coming soon...</div>}
+            </motion.div>
+          </>
+        )}
       </div>
     </div>
   );

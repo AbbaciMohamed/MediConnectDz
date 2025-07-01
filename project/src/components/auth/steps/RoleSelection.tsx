@@ -6,10 +6,9 @@ interface RoleSelectionProps {
   selectedRole: 'patient' | 'clinic' | 'supplier' | null;
   onRoleSelect: (role: 'patient' | 'clinic' | 'supplier') => void;
   errors: Record<string, string>;
-  firstInputRef?: React.RefObject<HTMLInputElement>;
 }
 
-const RoleSelection: React.FC<RoleSelectionProps> = ({ selectedRole, onRoleSelect, errors, firstInputRef }) => {
+const RoleSelection: React.FC<RoleSelectionProps> = ({ selectedRole, onRoleSelect, errors }) => {
   const roles = [
     {
       id: 'patient' as const,

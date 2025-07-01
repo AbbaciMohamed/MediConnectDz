@@ -1,173 +1,185 @@
-import React, { useState } from 'react';
-import { Plus, Heart, Mail, Phone, Globe, Facebook, Twitter, Instagram, Linkedin } from 'lucide-react';
+import React from 'react';
+import { 
+  Mail, Phone, Facebook, Twitter, Instagram, Linkedin, 
+  ArrowUp, MapPin, Globe
+} from 'lucide-react';
+// import logomain from '../assets/logomain-removebg-preview.png';
 
 const Footer = () => {
-  const [selectedLanguage, setSelectedLanguage] = useState('en');
-
   const quickLinks = [
-    { name: 'Find Clinics', href: '#clinics' },
-    { name: 'Book Appointment', href: '#booking' },
-    { name: 'FAQ', href: '#faq' },
-    { name: 'Contact', href: '#contact' }
+    { name: 'Find Clinics', href: '/find-clinics' },
+    { name: 'Marketplace', href: '/marketplace' },
+    { name: 'Features', href: '/features' },
+    { name: 'How It Works', href: '/how-it-works' },
+    { name: 'About Us', href: '/about' },
   ];
 
-  const resources = [
-    { name: 'Blog', href: '#blog' },
-    { name: 'Health Tips', href: '#tips' },
-    { name: 'Privacy Policy', href: '#privacy' },
-    { name: 'Terms of Service', href: '#terms' }
+  const supportLinks = [
+    { name: 'Help Center', href: '/help' },
+    { name: 'Contact Support', href: 'mailto:support@healthland.dz' },
+    { name: 'FAQs', href: '/faqs' },
+    { name: 'System Status', href: '/status' },
+  ];
+
+  const legalLinks = [
+    { name: 'Privacy Policy', href: '/privacy' },
+    { name: 'Terms of Service', href: '/terms' },
+    { name: 'Cookie Policy', href: '/cookies' },
+    { name: 'GDPR', href: '/gdpr' },
   ];
 
   const socialLinks = [
-    { icon: Facebook, href: '#', label: 'Follow us on Facebook' },
-    { icon: Twitter, href: '#', label: 'Follow us on Twitter' },
-    { icon: Instagram, href: '#', label: 'Follow us on Instagram' },
-    { icon: Linkedin, href: '#', label: 'Connect with us on LinkedIn' }
+    { icon: Facebook, href: '#', label: 'Facebook' },
+    { icon: Twitter, href: '#', label: 'Twitter' },
+    { icon: Instagram, href: '#', label: 'Instagram' },
+    { icon: Linkedin, href: '#', label: 'LinkedIn' },
+    { icon: Globe, href: '#', label: 'Website' },
   ];
 
-  const languages = [
-    { code: 'en', name: 'English' },
-    { code: 'ar', name: 'العربية' },
-    { code: 'fr', name: 'Français' }
-  ];
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   return (
-    <footer className="bg-neutral-900 text-white">
+    <footer className="bg-gradient-to-b from-gray-900 to-gray-950 text-white">
+      {/* Top decorative wave */}
+      <div className="w-full h-12 bg-gradient-to-r from-teal-600 via-blue-500 to-indigo-600"></div>
+      
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {/* About HealthLand */}
-          <div className="space-y-4">
-            <div className="flex items-center space-x-2">
-              <div className="relative">
-                <Plus className="w-6 h-6 text-primary absolute top-0 left-0" />
-                <Heart className="w-6 h-6 text-primary transform translate-x-2 translate-y-2" />
-              </div>
-              <span className="ml-4 text-xl font-jakarta font-bold">
-                HealthLand
-              </span>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10">
+          {/* Brand & Description */}
+          <div className="lg:col-span-2">
+            <div className="flex items-center space-x-3 mb-6">
+              <h2 className="text-2xl font-bold text-white">HealthLand</h2>
             </div>
-            <p className="text-gray-300 font-inter leading-relaxed">
+            <p className="text-gray-300 mb-6 leading-relaxed">
               Connecting you with trusted healthcare providers across Algeria. 
-              Your health, our priority.
+              Your health journey simplified with our comprehensive platform.
             </p>
-            <div className="flex space-x-4">
-              {socialLinks.map((social) => (
-                <a
-                  key={social.label}
-                  href={social.href}
-                  className="text-gray-400 hover:text-primary transition-colors duration-200"
-                  aria-label={social.label}
-                >
-                  <social.icon className="w-5 h-5" />
-                </a>
-              ))}
-            </div>
           </div>
-
+          
           {/* Quick Links */}
           <div>
-            <h3 className="text-lg font-jakarta font-semibold mb-4">Quick Links</h3>
+            <h3 className="text-lg font-semibold mb-6 pb-2 border-b border-gray-800">Quick Links</h3>
             <ul className="space-y-3">
               {quickLinks.map((link) => (
                 <li key={link.name}>
                   <a
                     href={link.href}
-                    className="text-gray-300 hover:text-primary transition-colors duration-200 font-inter"
+                    className="flex items-center text-gray-300 hover:text-teal-400 transition-colors duration-300 group"
                   >
+                    <span className="h-0.5 w-3 bg-teal-500 mr-2 opacity-0 group-hover:opacity-100 transition-opacity"></span>
                     {link.name}
                   </a>
                 </li>
               ))}
             </ul>
           </div>
-
-          {/* Resources */}
+          
+          {/* Support Links */}
           <div>
-            <h3 className="text-lg font-jakarta font-semibold mb-4">Resources</h3>
+            <h3 className="text-lg font-semibold mb-6 pb-2 border-b border-gray-800">Support</h3>
             <ul className="space-y-3">
-              {resources.map((resource) => (
-                <li key={resource.name}>
+              {supportLinks.map((link) => (
+                <li key={link.name}>
                   <a
-                    href={resource.href}
-                    className="text-gray-300 hover:text-primary transition-colors duration-200 font-inter"
+                    href={link.href}
+                    className="flex items-center text-gray-300 hover:text-teal-400 transition-colors duration-300 group"
                   >
-                    {resource.name}
+                    <span className="h-0.5 w-3 bg-teal-500 mr-2 opacity-0 group-hover:opacity-100 transition-opacity"></span>
+                    {link.name}
                   </a>
                 </li>
               ))}
             </ul>
           </div>
-
-          {/* Contact */}
+          
+          {/* Contact & Social */}
           <div>
-            <h3 className="text-lg font-jakarta font-semibold mb-4">Contact Us</h3>
-            <div className="space-y-3">
-              <div className="flex items-center space-x-3">
-                <Mail className="w-5 h-5 text-primary flex-shrink-0" />
+            <h3 className="text-lg font-semibold mb-6 pb-2 border-b border-gray-800">Contact Us</h3>
+            <div className="space-y-4">
+              <div className="flex items-start space-x-3">
+                <Mail className="w-5 h-5 text-teal-400 mt-1 flex-shrink-0" />
                 <a
                   href="mailto:support@healthland.dz"
-                  className="text-gray-300 hover:text-primary transition-colors duration-200 font-inter"
+                  className="text-gray-300 hover:text-teal-400 transition-colors duration-300"
                 >
                   support@healthland.dz
                 </a>
               </div>
-              <div className="flex items-center space-x-3">
-                <Phone className="w-5 h-5 text-primary flex-shrink-0" />
+              <div className="flex items-start space-x-3">
+                <Phone className="w-5 h-5 text-teal-400 mt-1 flex-shrink-0" />
                 <a
                   href="tel:+213555123456"
-                  className="text-gray-300 hover:text-primary transition-colors duration-200 font-inter"
+                  className="text-gray-300 hover:text-teal-400 transition-colors duration-300"
                 >
                   +213 555 123 456
                 </a>
               </div>
-              <div className="flex items-center space-x-3">
-                <Globe className="w-5 h-5 text-primary flex-shrink-0" />
-                <select
-                  value={selectedLanguage}
-                  onChange={(e) => setSelectedLanguage(e.target.value)}
-                  className="bg-transparent text-gray-300 border border-gray-600 rounded px-2 py-1 text-sm font-inter focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
-                  aria-label="Select language"
-                >
-                  {languages.map((lang) => (
-                    <option key={lang.code} value={lang.code} className="bg-neutral-900">
-                      {lang.name}
-                    </option>
-                  ))}
-                </select>
+              <div className="flex items-start space-x-3">
+                <MapPin className="w-5 h-5 text-teal-400 mt-1 flex-shrink-0" />
+                <span className="text-gray-300">
+                  123 Healthcare Avenue<br />
+                  Algiers, Algeria 16000
+                </span>
+              </div>
+            </div>
+            
+            {/* Social Links */}
+            <div className="mt-8">
+              <h3 className="text-lg font-semibold mb-3">Follow Us</h3>
+              <div className="flex space-x-4">
+                {socialLinks.map((social, index) => (
+                  <a
+                    key={index}
+                    href={social.href}
+                    className="bg-gray-800 hover:bg-gradient-to-r from-teal-500 to-blue-600 p-3 rounded-full transition-all duration-300"
+                    aria-label={social.label}
+                  >
+                    <social.icon className="w-5 h-5" />
+                  </a>
+                ))}
               </div>
             </div>
           </div>
         </div>
-
+        
+        {/* Divider */}
+        <div className="border-t border-gray-800 my-10"></div>
+        
         {/* Bottom bar */}
-        <div className="border-t border-gray-800 mt-12 pt-8">
-          <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-            <p className="text-gray-400 font-inter text-sm">
-              © 2025 HealthLand. All rights reserved.
-            </p>
-            <div className="flex space-x-6 text-sm">
+        <div className="flex flex-col md:flex-row justify-between items-center gap-6">
+          <div className="flex flex-wrap justify-center gap-6 text-sm">
+            {legalLinks.map((link) => (
               <a
-                href="#privacy"
-                className="text-gray-400 hover:text-primary transition-colors duration-200 font-inter"
+                key={link.name}
+                href={link.href}
+                className="text-gray-400 hover:text-teal-400 transition-colors duration-300"
               >
-                Privacy Policy
+                {link.name}
               </a>
-              <a
-                href="#terms"
-                className="text-gray-400 hover:text-primary transition-colors duration-200 font-inter"
-              >
-                Terms of Service
-              </a>
-              <a
-                href="#cookies"
-                className="text-gray-400 hover:text-primary transition-colors duration-200 font-inter"
-              >
-                Cookie Policy
-              </a>
-            </div>
+            ))}
           </div>
+          
+          <p className="text-gray-500 text-sm text-center">
+            © 2025 HealthLand. All rights reserved. 
+            <span className="block md:inline mt-1 md:mt-0 md:ml-2">Made with ❤️ for healthier communities</span>
+          </p>
+          
+          <button 
+            onClick={scrollToTop}
+            className="flex items-center gap-2 text-gray-400 hover:text-teal-400 transition-colors duration-300 group"
+          >
+            <span>Back to top</span>
+            <div className="bg-gray-800 group-hover:bg-gradient-to-r from-teal-500 to-blue-600 p-2 rounded-full transition-all duration-300">
+              <ArrowUp className="w-4 h-4" />
+            </div>
+          </button>
         </div>
       </div>
+      
+      {/* Decorative bottom border */}
+      <div className="h-2 bg-gradient-to-r from-teal-600 via-blue-500 to-indigo-600"></div>
     </footer>
   );
 };

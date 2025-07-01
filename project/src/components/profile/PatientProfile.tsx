@@ -44,66 +44,43 @@ const PatientProfile: React.FC<PatientProfileProps> = ({ patient }) => {
     { id: 'documents', label: 'Documents & Support', icon: FileText }
   ];
 
-  const mockAppointments = [
-    {
-      id: '1',
-      date: new Date('2025-01-15'),
-      time: '10:00 AM',
-      clinic: 'Algiers Medical Center',
-      doctor: 'Dr. Ahmed Benali',
-      type: 'General Consultation',
-      status: 'confirmed'
-    },
-    {
-      id: '2',
-      date: new Date('2025-01-22'),
-      time: '2:30 PM',
-      clinic: 'Cardiology Clinic Oran',
-      doctor: 'Dr. Fatima Cherif',
-      type: 'Cardiology Follow-up',
-      status: 'confirmed'
-    }
-  ];
 
-  const mockPastVisits = [
-    {
-      id: '1',
-      date: new Date('2024-12-10'),
-      clinic: 'Algiers Medical Center',
-      doctor: 'Dr. Ahmed Benali',
-      type: 'Annual Checkup',
-      summary: 'Routine examination completed. All vitals normal.'
-    },
-    {
-      id: '2',
-      date: new Date('2024-11-15'),
-      clinic: 'Dental Excellence Clinic',
-      doctor: 'Dr. Karim Mammeri',
-      type: 'Dental Cleaning',
-      summary: 'Professional cleaning and fluoride treatment.'
-    }
-  ];
+  const [appointments, setAppointments] = useState<any[]>([]);
+  const [pastVisits, setPastVisits] = useState<any[]>([]);
+  const [documents, setDocuments] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const mockDocuments = [
-    {
-      id: '1',
-      name: 'Blood Test Results - December 2024',
-      type: 'Lab Report',
-      date: new Date('2024-12-10'),
-      size: '245 KB'
-    },
-    {
-      id: '2',
-      name: 'Vaccination Record',
-      type: 'Medical Record',
-      date: new Date('2024-10-05'),
-      size: '156 KB'
-    }
-  ];
+  React.useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        // Fetch appointments (upcoming and past)
+        const res = await fetch(`/api/appointments?patientId=${patient.id}`, { credentials: 'include' });
+        if (!res.ok) throw new Error('Failed to fetch appointments');
+        const data = await res.json();
+        setAppointments(data.upcoming || []);
+        setPastVisits(data.past || []);
+
+        // Fetch documents
+        const resDocs = await fetch(`/api/documents?patientId=${patient.id}`, { credentials: 'include' });
+        if (resDocs.ok) {
+          const docs = await resDocs.json();
+          setDocuments(docs);
+        }
+      } catch (err: any) {
+        setError(err.message || 'Error loading data');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, [patient.id]);
 
   const handleSave = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/profile/${editData.id}`, {
+      const response = await fetch(`/api/profile/${editData.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(editData),
@@ -396,87 +373,155 @@ const PatientProfile: React.FC<PatientProfileProps> = ({ patient }) => {
 
   const renderActivity = () => (
     <div className="space-y-8">
-      {/* Upcoming Appointments */}
-      <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
-        <h3 className="text-xl font-jakarta font-semibold text-neutral-900 mb-6">Upcoming Appointments</h3>
-        <div className="space-y-4">
-          {mockAppointments.map((appointment) => (
-            <div key={appointment.id} className="border border-gray-200 rounded-lg p-6">
-              <div className="flex items-center justify-between mb-4">
-                <div>
-                  <h4 className="font-inter font-semibold text-gray-900">{appointment.type}</h4>
-                  <p className="text-sm text-gray-600">{appointment.clinic}</p>
+      {loading ? (
+        <div className="text-center py-12 text-gray-500 font-inter">Loading activity...</div>
+      ) : error ? (
+        <div className="text-center py-12 text-red-500 font-inter">{error}</div>
+      ) : (
+        <>
+          {/* Upcoming Appointments */}
+          <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
+            <h3 className="text-xl font-jakarta font-semibold text-neutral-900 mb-6">Upcoming Appointments</h3>
+            <div className="space-y-4">
+              {appointments.length === 0 ? (
+                <div className="text-gray-500 font-inter text-center py-8">No upcoming appointments</div>
+              ) : appointments.map((appointment) => (
+                <div key={appointment.id} className="border border-gray-200 rounded-lg p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <div>
+                      <h4 className="font-inter font-semibold text-gray-900">{appointment.type}</h4>
+                      <p className="text-sm text-gray-600">{appointment.clinic}</p>
+                    </div>
+                    <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-inter font-medium">
+                      {appointment.status}
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                    <div className="flex items-center space-x-2">
+                      <Calendar className="w-4 h-4 text-gray-400" />
+                      <span className="text-sm font-inter text-gray-600">
+                        {appointment.date ? new Date(appointment.date).toLocaleDateString() : '-'}
+                      </span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Clock className="w-4 h-4 text-gray-400" />
+                      <span className="text-sm font-inter text-gray-600">{appointment.time || '-'}</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <User className="w-4 h-4 text-gray-400" />
+                      <span className="text-sm font-inter text-gray-600">{appointment.doctor || '-'}</span>
+                    </div>
+                  </div>
+                  <div className="flex space-x-3">
+                    <button className="text-primary hover:text-primary/80 font-inter font-medium text-sm">
+                      Reschedule
+                    </button>
+                    <button className="text-red-600 hover:text-red-700 font-inter font-medium text-sm">
+                      Cancel
+                    </button>
+                  </div>
                 </div>
-                <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-inter font-medium">
-                  {appointment.status}
-                </span>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                <div className="flex items-center space-x-2">
-                  <Calendar className="w-4 h-4 text-gray-400" />
-                  <span className="text-sm font-inter text-gray-600">
-                    {appointment.date.toLocaleDateString()}
-                  </span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Clock className="w-4 h-4 text-gray-400" />
-                  <span className="text-sm font-inter text-gray-600">{appointment.time}</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <User className="w-4 h-4 text-gray-400" />
-                  <span className="text-sm font-inter text-gray-600">{appointment.doctor}</span>
-                </div>
-              </div>
-              <div className="flex space-x-3">
-                <button className="text-primary hover:text-primary/80 font-inter font-medium text-sm">
-                  Reschedule
-                </button>
-                <button className="text-red-600 hover:text-red-700 font-inter font-medium text-sm">
-                  Cancel
-                </button>
-              </div>
+              ))}
             </div>
-          ))}
-        </div>
-      </div>
+          </div>
 
-      {/* Past Visits */}
-      <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
-        <h3 className="text-xl font-jakarta font-semibold text-neutral-900 mb-6">Past Visits</h3>
-        <div className="space-y-4">
-          {mockPastVisits.map((visit) => (
-            <div key={visit.id} className="border border-gray-200 rounded-lg p-6">
-              <div className="flex items-center justify-between mb-3">
-                <h4 className="font-inter font-semibold text-gray-900">{visit.type}</h4>
-                <span className="text-sm text-gray-500">{visit.date.toLocaleDateString()}</span>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
-                <div className="flex items-center space-x-2">
-                  <MapPin className="w-4 h-4 text-gray-400" />
-                  <span className="text-sm font-inter text-gray-600">{visit.clinic}</span>
+          {/* Past Visits */}
+          <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
+            <h3 className="text-xl font-jakarta font-semibold text-neutral-900 mb-6">Past Visits</h3>
+            <div className="space-y-4">
+              {pastVisits.length === 0 ? (
+                <div className="text-gray-500 font-inter text-center py-8">No past visits</div>
+              ) : pastVisits.map((visit) => (
+                <div key={visit.id} className="border border-gray-200 rounded-lg p-6">
+                  <div className="flex items-center justify-between mb-3">
+                    <h4 className="font-inter font-semibold text-gray-900">{visit.type}</h4>
+                    <span className="text-sm text-gray-500">{visit.date ? new Date(visit.date).toLocaleDateString() : '-'}</span>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
+                    <div className="flex items-center space-x-2">
+                      <MapPin className="w-4 h-4 text-gray-400" />
+                      <span className="text-sm font-inter text-gray-600">{visit.clinic}</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <User className="w-4 h-4 text-gray-400" />
+                      <span className="text-sm font-inter text-gray-600">{visit.doctor}</span>
+                    </div>
+                  </div>
+                  <p className="text-sm text-gray-600 font-inter">{visit.summary}</p>
                 </div>
-                <div className="flex items-center space-x-2">
-                  <User className="w-4 h-4 text-gray-400" />
-                  <span className="text-sm font-inter text-gray-600">{visit.doctor}</span>
-                </div>
-              </div>
-              <p className="text-sm text-gray-600 font-inter">{visit.summary}</p>
+              ))}
             </div>
-          ))}
-        </div>
-      </div>
+          </div>
 
-      {/* Chat Transcripts */}
-      <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
-        <h3 className="text-xl font-jakarta font-semibold text-neutral-900 mb-6">Chat Transcripts</h3>
-        <div className="text-center py-8">
-          <MessageCircle className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-          <h4 className="font-inter font-medium text-gray-600 mb-2">No chat history yet</h4>
-          <p className="text-sm text-gray-500">Your conversations with healthcare providers will appear here</p>
-        </div>
-      </div>
+          {/* Chat Transcripts */}
+          <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
+            <h3 className="text-xl font-jakarta font-semibold text-neutral-900 mb-6">Chat Transcripts</h3>
+            <div className="text-center py-8">
+              <MessageCircle className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+              <h4 className="font-inter font-medium text-gray-600 mb-2">No chat history yet</h4>
+              <p className="text-sm text-gray-500">Your conversations with healthcare providers will appear here</p>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
+
+  // Document upload handler
+  const handleDocumentUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || e.target.files.length === 0) return;
+    const formData = new FormData();
+    for (const file of Array.from(e.target.files)) {
+      formData.append('documents', file);
+    }
+    formData.append('patientId', patient.id);
+    try {
+      const res = await fetch('/api/documents', {
+        method: 'POST',
+        body: formData,
+        credentials: 'include',
+      });
+      if (!res.ok) throw new Error('Failed to upload document');
+      // Refresh document list
+      const docs = await res.json();
+      setDocuments(docs);
+      alert('Document(s) uploaded successfully!');
+    } catch (err: any) {
+      alert(err.message || 'Error uploading document');
+    }
+  };
+
+  // Document download handler
+  const handleDocumentDownload = async (docId: string) => {
+    try {
+      const res = await fetch(`/api/documents/${docId}/download`, { credentials: 'include' });
+      if (!res.ok) throw new Error('Failed to download document');
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = '';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (err: any) {
+      alert(err.message || 'Error downloading document');
+    }
+  };
+
+  // Document delete handler
+  const handleDocumentDelete = async (docId: string) => {
+    if (!window.confirm('Are you sure you want to delete this document?')) return;
+    try {
+      const res = await fetch(`/api/documents/${docId}`, { method: 'DELETE', credentials: 'include' });
+      if (!res.ok) throw new Error('Failed to delete document');
+      setDocuments(docs => docs.filter(d => d.id !== docId));
+      alert('Document deleted successfully!');
+    } catch (err: any) {
+      alert(err.message || 'Error deleting document');
+    }
+  };
 
   const renderDocuments = () => (
     <div className="space-y-8">
@@ -484,7 +529,13 @@ const PatientProfile: React.FC<PatientProfileProps> = ({ patient }) => {
       <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
         <h3 className="text-xl font-jakarta font-semibold text-neutral-900 mb-6">Medical Documents</h3>
         <div className="space-y-4">
-          {mockDocuments.map((doc) => (
+          {loading ? (
+            <div className="text-center py-8 text-gray-500 font-inter">Loading documents...</div>
+          ) : error ? (
+            <div className="text-center py-8 text-red-500 font-inter">{error}</div>
+          ) : documents.length === 0 ? (
+            <div className="text-center py-8 text-gray-500 font-inter">No documents found</div>
+          ) : documents.map((doc: any) => (
             <div key={doc.id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
               <div className="flex items-center space-x-4">
                 <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
@@ -494,17 +545,17 @@ const PatientProfile: React.FC<PatientProfileProps> = ({ patient }) => {
                   <h4 className="font-inter font-medium text-gray-900">{doc.name}</h4>
                   <div className="flex items-center space-x-4 text-sm text-gray-500">
                     <span>{doc.type}</span>
-                    <span>{doc.date.toLocaleDateString()}</span>
+                    <span>{doc.date ? new Date(doc.date).toLocaleDateString() : '-'}</span>
                     <span>{doc.size}</span>
                   </div>
                 </div>
               </div>
               <div className="flex space-x-2">
-                <button className="p-2 text-gray-600 hover:text-primary hover:bg-primary/10 rounded-lg transition-colors">
-                  <Eye className="w-4 h-4" />
-                </button>
-                <button className="p-2 text-gray-600 hover:text-primary hover:bg-primary/10 rounded-lg transition-colors">
+                <button className="p-2 text-gray-600 hover:text-primary hover:bg-primary/10 rounded-lg transition-colors" onClick={() => handleDocumentDownload(doc.id)}>
                   <Download className="w-4 h-4" />
+                </button>
+                <button className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors" onClick={() => handleDocumentDelete(doc.id)}>
+                  <X className="w-4 h-4" />
                 </button>
               </div>
             </div>
@@ -521,9 +572,19 @@ const PatientProfile: React.FC<PatientProfileProps> = ({ patient }) => {
           <p className="text-sm text-gray-600 mb-4">
             Upload allergies, prescriptions, or other medical documents
           </p>
-          <button className="bg-primary text-white px-6 py-3 rounded-lg font-inter font-medium hover:bg-primary/90 transition-colors">
-            Choose Files
-          </button>
+          <input
+            type="file"
+            multiple
+            accept=".pdf,.jpg,.jpeg,.png"
+            className="hidden"
+            id="document-upload-input"
+            onChange={handleDocumentUpload}
+          />
+          <label htmlFor="document-upload-input">
+            <span className="bg-primary text-white px-6 py-3 rounded-lg font-inter font-medium hover:bg-primary/90 transition-colors cursor-pointer">
+              Choose Files
+            </span>
+          </label>
           <p className="text-xs text-gray-500 mt-3">PDF, JPG, PNG up to 10MB</p>
         </div>
       </div>
@@ -540,7 +601,6 @@ const PatientProfile: React.FC<PatientProfileProps> = ({ patient }) => {
               Visit Help Center
             </button>
           </div>
-          
           <div className="p-6 bg-gray-50 rounded-lg">
             <MessageCircle className="w-8 h-8 text-primary mb-4" />
             <h4 className="font-inter font-semibold text-gray-900 mb-2">Contact Support</h4>

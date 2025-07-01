@@ -18,6 +18,11 @@ class ChatbotService {
 
   async getChatbotResponse(message, userId) {
     try {
+      if (!this.openai) {
+        console.error('[ChatbotService] OpenAI client not initialized. Check your OPENAI_API_KEY in .env.');
+        return '⚠️ OpenAI API is not configured. Please contact the administrator.';
+      }
+      console.log('[ChatbotService] Calling OpenAI with message:', message);
       const history = this.conversationHistory.get(userId) || [];
       const messages = [
         { role: 'system', content: SYSTEM_PROMPT },
@@ -42,7 +47,7 @@ class ChatbotService {
 
     } catch (error) {
       console.error('Chatbot API Error:', error);
-      return `⚠️ I’m having technical difficulties. Please try again later or consult a healthcare provider directly.`;
+      return `⚠️ I'm having technical difficulties. Please try again later or consult a healthcare provider directly.`;
     }
   }
 

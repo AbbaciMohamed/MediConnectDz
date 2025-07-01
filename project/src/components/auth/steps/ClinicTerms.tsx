@@ -6,10 +6,9 @@ interface ClinicTermsProps {
   formData: any;
   setFormData: (data: any) => void;
   errors: Record<string, string>;
-  firstInputRef?: React.RefObject<HTMLInputElement>;
 }
 
-const ClinicTerms: React.FC<ClinicTermsProps> = ({ formData, setFormData, errors, firstInputRef }) => {
+const ClinicTerms: React.FC<ClinicTermsProps> = ({ formData, setFormData, errors }) => {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
