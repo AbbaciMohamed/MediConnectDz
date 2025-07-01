@@ -19,6 +19,7 @@ import FeaturesPage from './pages/FeaturesPage';
 import AboutPage from './pages/AboutPage';
 import HowItWorksPage from './pages/HowItWorksPage';
 import TestimonialsPage from './pages/TestimonialsPage';
+import ScanPage from './pages/ScanPage';
 
 const HomePage = () => (
   <main>
@@ -48,6 +49,7 @@ const AppContent = () => {
         <Route path="/about" element={<AboutPage />} />
         <Route path="/how-it-works" element={<HowItWorksPage />} />
         <Route path="/testimonials" element={<TestimonialsPage />} />
+        <Route path="/scan" element={<ScanPage />} />
         
         {/* Profile routes */}
         <Route path="/profile" element={<ProfileRouter />} />

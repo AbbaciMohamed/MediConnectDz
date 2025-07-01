@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+git import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MessageCircle, Send, X, User, Bot, Minimize2, Maximize2 } from 'lucide-react';
 import { ChatMessage } from '../../types';
