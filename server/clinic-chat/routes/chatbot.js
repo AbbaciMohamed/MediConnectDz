@@ -2,8 +2,8 @@ const express = require('express');
 const router = express.Router();
 const { body } = require('express-validator');
 const chatbotController = require('../controllers/chatbotController');
-const { validateRequest } = require('../../shared/middleware/validation');
-const { authenticateToken } = require('../../shared/middleware/auth');
+const { validateRequest } = require('../../middleware/validation');
+const { authenticateToken } = require('../../middleware/auth');
 
 // Send message to chatbot (public endpoint - no authentication required)
 router.post('/message', [

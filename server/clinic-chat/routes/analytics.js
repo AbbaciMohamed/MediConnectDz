@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const analyticsController = require('../controllers/analyticsController');
-const auth = require('../../shared/middleware/auth');
+const auth = require('../../middleware/auth');
 
 router.get('/appointments/doctor', auth, analyticsController.appointmentsByDoctor);
 router.get('/appointments/clinic', auth, analyticsController.appointmentsByClinic);

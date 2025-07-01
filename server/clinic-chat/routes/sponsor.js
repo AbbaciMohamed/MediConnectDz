@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const sponsorController = require('../controllers/sponsorController');
-const auth = require('../../shared/middleware/auth');
+const auth = require('../../middleware/auth');
 
 // Clinic requests/updates sponsorship
 router.post('/clinic', auth, sponsorController.requestClinicSponsorship);

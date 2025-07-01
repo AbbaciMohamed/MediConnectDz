@@ -5,26 +5,26 @@ import { UserPlus, Search, Calendar, Heart, MessageCircle, Shield, CheckCircle }
 const steps = [
   {
     icon: UserPlus,
-    title: 'Create Your Account',
-    description: 'Sign up in minutes with your basic information. Your privacy is our priority with bank-level security.',
+    title: 'Sign Up Instantly',
+    description: 'Create your free HealthLand account in seconds. All you need is your basic info—no paperwork required.',
     color: 'bg-blue-500',
-    features: ['Secure registration', 'Email verification', 'Profile setup'],
-    time: '2 minutes'
+    features: ['Quick registration', 'Secure data', 'No hidden fees'],
+    time: '1 min'
   },
   {
     icon: Search,
-    title: 'Find & Book',
-    description: 'Search for healthcare providers, compare options, and book your appointment instantly.',
+    title: 'Find & Book Care',
+    description: 'Search for clinics, compare providers, and book appointments online—anytime, anywhere.',
     color: 'bg-primary',
-    features: ['Smart search', 'Real-time availability', 'Instant booking'],
-    time: '30 seconds'
+    features: ['Smart search', 'Real-time booking', 'Verified reviews'],
+    time: '30 sec'
   },
   {
     icon: Heart,
-    title: 'Visit & Review',
-    description: 'Attend your appointment and share your experience to help others in the community.',
+    title: 'Get Treated & Review',
+    description: 'Visit your clinic, get the care you need, and share your experience to help others.',
     color: 'bg-secondary',
-    features: ['Appointment reminders', 'Digital records', 'Community reviews'],
+    features: ['Easy check-in', 'Digital records', 'Community feedback'],
     time: 'Ongoing'
   }
 ];
@@ -38,14 +38,17 @@ const benefits = [
 
 const HowItWorks = () => {
   return (
-    <section id="how-it-works" className="py-20 bg-gradient-to-b from-neutral-50 to-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="how-it-works" className="relative py-16 md:py-24 bg-gradient-to-br from-white via-blue-50 to-primary/10 overflow-hidden">
+      {/* Animated background shapes */}
+      <div className="absolute -top-16 left-1/3 w-72 h-72 bg-primary/10 rounded-full blur-3xl animate-pulse-slow z-0" />
+      <div className="absolute bottom-0 right-0 w-40 h-40 bg-secondary/10 rounded-full blur-2xl animate-float z-0" />
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-10">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
-          className="text-center mb-16"
+          className="text-center mb-14 md:mb-20"
         >
           <div className="inline-flex items-center bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-inter font-medium mb-6">
             <CheckCircle className="w-4 h-4 mr-2" />
@@ -55,28 +58,27 @@ const HowItWorks = () => {
             How It Works
           </h2>
           <p className="text-xl text-gray-600 font-inter max-w-3xl mx-auto leading-relaxed">
-            Getting started with HealthLand is simple. Follow these three easy steps to begin your 
-            healthcare journey and connect with trusted providers.
+            HealthLand makes healthcare simple. Create your account, find and book trusted providers, and manage your health journey—all in just a few steps.
           </p>
         </motion.div>
 
-        <div className="relative mb-16">
+        <div className="relative mb-10 md:mb-20">
           {/* Desktop: Horizontal layout */}
           <div className="hidden md:flex justify-between items-start relative">
             {/* Connector line */}
-            <div className="absolute top-20 left-0 right-0 h-1 bg-gray-200 z-0">
+            <div className="absolute top-20 left-0 right-0 h-1 z-0">
               <motion.div
                 initial={{ width: 0 }}
                 whileInView={{ width: '100%' }}
                 viewport={{ once: true }}
                 transition={{ duration: 2, ease: 'easeInOut', delay: 0.5 }}
-                className="h-full bg-gradient-to-r from-blue-500 via-primary to-secondary relative"
+                className="h-full bg-gradient-to-r from-blue-400 via-primary to-secondary shadow-lg rounded-full"
               >
                 {/* Animated progress dots */}
                 <motion.div
                   animate={{ x: ['0%', '50%', '100%'] }}
                   transition={{ duration: 4, repeat: Infinity, ease: 'linear' }}
-                  className="absolute top-1/2 transform -translate-y-1/2 w-3 h-3 bg-white border-2 border-primary rounded-full shadow-lg"
+                  className="absolute top-1/2 transform -translate-y-1/2 w-4 h-4 bg-white border-4 border-primary rounded-full shadow-xl opacity-80"
                 />
               </motion.div>
             </div>
@@ -88,24 +90,25 @@ const HowItWorks = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6, delay: index * 0.2 }}
-                className="flex flex-col items-center text-center max-w-sm z-10 bg-white rounded-3xl p-8 shadow-lg hover:shadow-xl transition-shadow duration-300"
+                whileHover={{ y: -10, scale: 1.04, boxShadow: '0 8px 32px 0 rgba(0,0,0,0.18)' }}
+                className="flex flex-col items-center text-center max-w-sm z-10 bg-white/70 backdrop-blur-xl rounded-3xl p-10 shadow-2xl hover:shadow-primary/30 transition-all duration-300 relative border border-primary/10"
               >
                 {/* Step number */}
-                <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-white border-4 border-gray-100 rounded-full w-8 h-8 flex items-center justify-center">
-                  <span className="text-sm font-jakarta font-bold text-gray-600">{index + 1}</span>
+                <div className="absolute -top-7 left-1/2 transform -translate-x-1/2 bg-gradient-to-br from-primary to-blue-400 shadow-xl border-4 border-white rounded-full w-14 h-14 flex items-center justify-center z-20">
+                  <span className="text-2xl font-jakarta font-bold text-white drop-shadow-lg">{index + 1}</span>
                 </div>
 
                 {/* Icon */}
                 <motion.div
-                  whileHover={{ scale: 1.1, rotate: 5 }}
-                  className={`${step.color} p-6 rounded-2xl mb-6 shadow-lg`}
+                  whileHover={{ scale: 1.18, rotate: 8, boxShadow: '0 0 32px 0 rgba(56,189,248,0.25)' }}
+                  className={`${step.color} p-7 rounded-2xl mb-7 shadow-lg flex items-center justify-center`}
                 >
-                  <step.icon className="w-8 h-8 text-white" />
+                  <step.icon className="w-10 h-10 text-white drop-shadow-lg" />
                 </motion.div>
 
                 {/* Content */}
                 <div className="space-y-4">
-                  <h3 className="text-xl font-jakarta font-bold text-neutral-900">
+                  <h3 className="text-2xl font-jakarta font-bold text-neutral-900">
                     {step.title}
                   </h3>
                   <p className="text-gray-600 font-inter leading-relaxed">
@@ -113,16 +116,16 @@ const HowItWorks = () => {
                   </p>
 
                   {/* Time indicator */}
-                  <div className="inline-flex items-center bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm font-inter font-medium">
-                    <Calendar className="w-3 h-3 mr-1" />
+                  <div className="inline-flex items-center bg-gray-100 text-gray-700 px-4 py-2 rounded-full text-base font-inter font-medium shadow-sm">
+                    <Calendar className="w-4 h-4 mr-2" />
                     {step.time}
                   </div>
 
                   {/* Features */}
                   <div className="space-y-2">
                     {step.features.map((feature, idx) => (
-                      <div key={idx} className="flex items-center text-sm text-gray-600">
-                        <CheckCircle className="w-4 h-4 text-green-500 mr-2 flex-shrink-0" />
+                      <div key={idx} className="flex items-center text-base text-gray-600">
+                        <CheckCircle className="w-5 h-5 text-green-500 mr-2 flex-shrink-0" />
                         <span className="font-inter">{feature}</span>
                       </div>
                     ))}
@@ -133,7 +136,7 @@ const HowItWorks = () => {
           </div>
 
           {/* Mobile: Vertical layout */}
-          <div className="md:hidden space-y-8">
+          <div className="md:hidden space-y-10">
             {steps.map((step, index) => (
               <motion.div
                 key={step.title}
@@ -145,8 +148,8 @@ const HowItWorks = () => {
               >
                 {/* Step indicator */}
                 <div className="flex flex-col items-center">
-                  <div className="bg-white border-4 border-gray-100 rounded-full w-8 h-8 flex items-center justify-center mb-4">
-                    <span className="text-sm font-jakarta font-bold text-gray-600">{index + 1}</span>
+                  <div className="bg-gradient-to-br from-primary to-blue-400 shadow-xl border-4 border-white rounded-full w-12 h-12 flex items-center justify-center mb-4">
+                    <span className="text-lg font-jakarta font-bold text-white drop-shadow-lg">{index + 1}</span>
                   </div>
                   {index < steps.length - 1 && (
                     <div className="w-0.5 h-16 bg-gray-200"></div>
@@ -154,27 +157,27 @@ const HowItWorks = () => {
                 </div>
 
                 {/* Icon */}
-                <div className={`${step.color} p-4 rounded-xl flex-shrink-0 shadow-lg`}>
-                  <step.icon className="w-6 h-6 text-white" />
+                <div className={`${step.color} p-5 rounded-xl flex-shrink-0 shadow-lg flex items-center justify-center`}>
+                  <step.icon className="w-8 h-8 text-white drop-shadow-lg" />
                 </div>
 
                 {/* Content */}
-                <div className="flex-1 space-y-3">
+                <div className="flex-1 space-y-4">
                   <div className="flex items-center justify-between">
                     <h3 className="text-lg font-jakarta font-bold text-neutral-900">
                       {step.title}
                     </h3>
-                    <div className="inline-flex items-center bg-gray-100 text-gray-700 px-2 py-1 rounded-full text-xs font-inter font-medium">
+                    <div className="inline-flex items-center bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm font-inter font-medium shadow-sm">
                       {step.time}
                     </div>
                   </div>
                   <p className="text-gray-600 font-inter leading-relaxed">
                     {step.description}
                   </p>
-                  <div className="space-y-1">
+                  <div className="space-y-2">
                     {step.features.map((feature, idx) => (
-                      <div key={idx} className="flex items-center text-sm text-gray-600">
-                        <CheckCircle className="w-3 h-3 text-green-500 mr-2 flex-shrink-0" />
+                      <div key={idx} className="flex items-center text-base text-gray-600">
+                        <CheckCircle className="w-5 h-5 text-green-500 mr-2 flex-shrink-0" />
                         <span className="font-inter">{feature}</span>
                       </div>
                     ))}
@@ -212,40 +215,6 @@ const HowItWorks = () => {
                 <span className="font-inter font-medium text-gray-800">{benefit.text}</span>
               </motion.div>
             ))}
-          </div>
-        </motion.div>
-
-        {/* Call to action */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8, delay: 0.4 }}
-          className="text-center"
-        >
-          <div className="bg-gradient-to-r from-primary to-primary/80 rounded-3xl p-8 text-white">
-            <h3 className="text-2xl font-jakarta font-bold mb-4">
-              Ready to Get Started?
-            </h3>
-            <p className="text-lg font-inter mb-6 opacity-90">
-              Join thousands of patients who trust HealthLand for their healthcare needs.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="bg-white text-primary px-8 py-4 rounded-xl font-inter font-semibold text-lg hover:bg-gray-100 transition-colors duration-300 focus:outline-none focus:ring-4 focus:ring-white/30"
-              >
-                Create Free Account
-              </motion.button>
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="border-2 border-white text-white px-8 py-4 rounded-xl font-inter font-semibold text-lg hover:bg-white/10 transition-colors duration-300 focus:outline-none focus:ring-4 focus:ring-white/30"
-              >
-                Watch Demo
-              </motion.button>
-            </div>
           </div>
         </motion.div>
       </div>

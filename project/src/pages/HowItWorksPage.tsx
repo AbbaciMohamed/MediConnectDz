@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { UserPlus, Search, Calendar, Heart, MessageCircle, Shield, CheckCircle, Play, ArrowRight, Smartphone, Globe, Clock, Star } from 'lucide-react';
+import { UserPlus, Search, Calendar, Heart, MessageCircle, Shield, CheckCircle } from 'lucide-react';
 
-const HowItWorksPage = () => {
+const HowItWorksPage = ({ onRegister }: { onRegister?: () => void }) => {
   const [activeRole, setActiveRole] = useState('patient');
   const [activeStep, setActiveStep] = useState(0);
 
@@ -144,6 +144,8 @@ const HowItWorksPage = () => {
       answer: 'Each provider profile clearly shows accepted insurance plans. You can also filter search results by your specific insurance provider.'
     }
   ];
+
+  const handleRegister = onRegister || (() => window.location.href = '/');
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white via-neutral-50 to-white">
@@ -292,13 +294,17 @@ const HowItWorksPage = () => {
                     </div>
                     
                     <div className="flex space-x-3">
-                      <button className="flex-1 bg-primary text-white py-3 rounded-xl font-inter font-semibold hover:bg-primary/90 transition-colors duration-200 flex items-center justify-center">
+                      <button
+                        className="flex-1 bg-primary text-white py-3 rounded-xl font-inter font-semibold hover:bg-primary/90 transition-colors duration-200 flex items-center justify-center"
+                        onClick={handleRegister}
+                      >
                         Get Started
-                        <ArrowRight className="w-4 h-4 ml-2" />
                       </button>
-                      <button className="px-6 py-3 border border-gray-300 text-gray-700 rounded-xl font-inter font-semibold hover:bg-gray-50 transition-colors duration-200 flex items-center justify-center">
-                        <Play className="w-4 h-4 mr-2" />
-                        Demo
+                      <button
+                        className="px-6 py-3 border border-gray-300 text-gray-700 rounded-xl font-inter font-semibold hover:bg-gray-50 transition-colors duration-200 flex items-center justify-center"
+                        onClick={() => window.location.href = '/how-it-works'}
+                      >
+                        Watch Demo
                       </button>
                     </div>
                   </div>
@@ -390,47 +396,6 @@ const HowItWorksPage = () => {
               </motion.div>
             ))}
           </div>
-        </div>
-      </section>
-
-      {/* Call to Action */}
-      <section className="py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-            className="bg-gradient-to-r from-primary to-primary/80 rounded-3xl p-8 md:p-12 text-center text-white relative overflow-hidden"
-          >
-            <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-secondary/20 opacity-50"></div>
-            <div className="relative z-10">
-              <h3 className="text-2xl md:text-3xl font-jakarta font-bold mb-4">
-                Ready to Get Started?
-              </h3>
-              <p className="text-lg md:text-xl font-inter mb-8 opacity-90 max-w-2xl mx-auto">
-                Join thousands of patients, healthcare providers, and suppliers who trust HealthLand 
-                for their healthcare needs. Start your journey today.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="bg-white text-primary px-8 py-4 rounded-xl font-inter font-semibold text-lg hover:bg-gray-100 transition-colors duration-300 focus:outline-none focus:ring-4 focus:ring-white/30 shadow-lg"
-                >
-                  Create Free Account
-                </motion.button>
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="border-2 border-white text-white px-8 py-4 rounded-xl font-inter font-semibold text-lg hover:bg-white/10 transition-colors duration-300 focus:outline-none focus:ring-4 focus:ring-white/30 flex items-center justify-center"
-                >
-                  <Play className="w-5 h-5 mr-2" />
-                  Watch Demo
-                </motion.button>
-              </div>
-            </div>
-          </motion.div>
         </div>
       </section>
     </div>

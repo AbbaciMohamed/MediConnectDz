@@ -10,7 +10,7 @@ const GeminiChatbot = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [userRole, setUserRole] = useState<'patient' | 'clinic' | 'supplier' | null>(null);
+  const [userRole, setUserRole] = useState<'patient' | 'clinic' | 'supplier' | 'admin' | 'clinicStaff' | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { user } = useAuth();
 
@@ -46,6 +46,16 @@ const GeminiChatbot = () => {
       'Upload clinical data',
       'View active RFPs',
       'Contact clinic directly'
+    ],
+    admin: [
+      'Manage users',
+      'View system logs',
+      'Update system settings'
+    ],
+    clinicStaff: [
+      'View booked appointments',
+      'Manage patient records',
+      'Update clinic schedule'
     ]
   };
 
@@ -53,7 +63,9 @@ const GeminiChatbot = () => {
     const prompts = {
       patient: "You are a helpful healthcare assistant for patients. Help them find clinics, book appointments, understand medical procedures, and provide general health information. Always recommend consulting with healthcare professionals for medical advice.",
       clinic: "You are a healthcare platform assistant for clinic administrators. Help them with platform features, security settings, analytics, subscription management, and compliance requirements.",
-      supplier: "You are a marketplace assistant for pharmaceutical suppliers. Help them understand the tender process, upload documents, find relevant opportunities, and connect with healthcare providers."
+      supplier: "You are a marketplace assistant for pharmaceutical suppliers. Help them understand the tender process, upload documents, find relevant opportunities, and connect with healthcare providers.",
+      admin: "You are a system administrator for the healthcare platform. Help with managing users, system logs, and settings.",
+      clinicStaff: "You are a clinic staff member. Help with managing patient records, booked appointments, and updating clinic schedule."
     };
     return prompts[role as keyof typeof prompts] || prompts.patient;
   };

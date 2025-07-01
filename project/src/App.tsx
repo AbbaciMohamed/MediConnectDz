@@ -5,10 +5,10 @@ import Header from './components/Header';
 import Footer from './components/Footer';
 import GeminiChatbot from './components/chat/GeminiChatbot';
 import ProfileRouter from './components/profile/ProfileRouter';
+import SignUpPage from './components/auth/SignUpPage';
 
 // Home page components
 import Hero from './components/Hero';
-import FeaturesCarousel from './components/FeaturesCarousel';
 import HowItWorks from './components/HowItWorks';
 import Testimonials from './components/Testimonials';
 
@@ -23,7 +23,6 @@ import TestimonialsPage from './pages/TestimonialsPage';
 const HomePage = () => (
   <main>
     <Hero />
-    <FeaturesCarousel />
     <HowItWorks />
     <Testimonials />
   </main>
@@ -53,6 +52,8 @@ const AppContent = () => {
         {/* Profile routes */}
         <Route path="/profile" element={<ProfileRouter />} />
         <Route path="/dashboard" element={<ProfileRouter />} />
+        {/* Sign Up route */}
+        <Route path="/signup" element={<SignUpPage />} />
       </Routes>
       <Footer />
       <GeminiChatbot />

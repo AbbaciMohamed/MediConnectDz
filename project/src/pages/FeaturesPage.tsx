@@ -1,474 +1,462 @@
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import { Calendar, MessageCircle, Shield, Clock, Users, Zap, CheckCircle, Award, Star, ArrowRight, Play, Smartphone, Globe, Lock, Heart, Bell, BarChart3 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Calendar, MessageCircle, Shield, Clock, Users, Zap, X, HeartPulse, Pill, Stethoscope, Activity, CheckCircle, Star, ArrowRight } from 'lucide-react';
 
-const FeaturesPage = () => {
-  const [activeFeature, setActiveFeature] = useState(0);
+const FeaturesShowcase = () => {
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [isMobile, setIsMobile] = useState(false);
+  const [expandedFeature, setExpandedFeature] = useState(null);
+  const [popupVisible, setPopupVisible] = useState(false);
 
-  const mainFeatures = [
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 1024);
+    };
+    
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const features = [
     {
       icon: Calendar,
-      title: 'Smart Booking System',
-      description: 'AI-powered appointment scheduling with real-time availability, automatic reminders, and seamless calendar integration.',
-      color: 'from-blue-500 to-blue-600',
+      title: 'Smart Booking',
+      description: 'AI-powered appointment scheduling with real-time availability and automatic reminders.',
       stats: '10K+ bookings/month',
-      benefits: ['Real-time availability', 'Automatic reminders', 'Calendar sync', 'Multi-provider booking'],
-      details: 'Our intelligent booking system uses machine learning to optimize appointment scheduling, reducing wait times and improving patient satisfaction. Features include conflict detection, automated rescheduling, and smart time slot recommendations.',
-      image: 'https://images.pexels.com/photos/4386467/pexels-photo-4386467.jpeg?auto=compress&cs=tinysrgb&w=600&h=400&dpr=2'
+      benefits: ['Real-time availability', 'Automatic reminders', 'Calendar sync'],
+      color: 'bg-blue-500',
+      detailedDescription: 'Our AI-powered booking system analyzes your schedule and preferences to find the perfect appointment time. It integrates with healthcare providers\' systems to show real-time availability, sends automatic reminders to reduce no-shows, and syncs with your calendar seamlessly.',
+      keyFeatures: [
+        'Intelligent time slot recommendations',
+        'Automated SMS/email reminders',
+        'Two-way calendar sync',
+        'Waitlist management',
+        'Rescheduling with one click'
+      ],
+      testimonial: 'Smart Booking saved me hours of phone calls and reduced my missed appointments to zero!'
     },
     {
       icon: MessageCircle,
       title: 'Secure Messaging',
-      description: 'HIPAA-compliant chat with healthcare providers, encrypted file sharing, and complete consultation history.',
-      color: 'from-green-500 to-green-600',
-      stats: '99.9% uptime',
-      benefits: ['End-to-end encryption', 'File sharing', 'Chat history', 'Multi-language support'],
-      details: 'Communicate securely with your healthcare team through our encrypted messaging platform. Share medical documents, ask questions, and receive timely responses while maintaining complete privacy and compliance.',
-      image: 'https://images.pexels.com/photos/5327585/pexels-photo-5327585.jpeg?auto=compress&cs=tinysrgb&w=600&h=400&dpr=2'
+      description: 'HIPAA-compliant chat with healthcare providers and encrypted file sharing.',
+      benefits: ['End-to-end encryption', 'File sharing', 'Chat history'],
+      color: 'bg-teal-500',
+      detailedDescription: 'Communicate with your healthcare team securely through our encrypted messaging platform. All messages are HIPAA-compliant with end-to-end encryption, allowing you to share sensitive documents and medical records safely.',
+      keyFeatures: [
+        'Military-grade encryption',
+        'Secure document sharing',
+        'Provider-to-patient messaging',
+        'Message history archive',
+        'Read receipts and delivery confirmations'
+      ],
+      testimonial: 'Being able to message my doctor directly and share test results securely has transformed my healthcare experience.'
     },
     {
       icon: Shield,
       title: 'Advanced Security',
-      description: 'Bank-level encryption, biometric authentication, comprehensive audit trails, and GDPR compliance.',
-      color: 'from-primary to-primary/80',
-      stats: 'Bank-level security',
-      benefits: ['Biometric auth', 'Audit trails', 'GDPR compliant', 'Zero-trust architecture'],
-      details: 'Your health data is protected with military-grade encryption and advanced security protocols. Our platform undergoes regular security audits and maintains the highest standards of data protection.',
-      image: 'https://images.pexels.com/photos/60504/security-protection-anti-virus-software-60504.jpeg?auto=compress&cs=tinysrgb&w=600&h=400&dpr=2'
+      description: 'Bank-level encryption, biometric authentication, and GDPR compliance.',
+      benefits: ['Biometric auth', 'Audit trails', 'GDPR compliant'],
+      color: 'bg-indigo-500',
+      detailedDescription: 'Your health data is protected with bank-level security measures. Our platform uses biometric authentication, comprehensive audit trails, and complies with all GDPR regulations to ensure your information remains private and secure.',
+      keyFeatures: [
+        'Facial recognition and fingerprint login',
+        'Real-time security alerts',
+        'Data encryption at rest and in transit',
+        'Regular security audits',
+        'Compliance with global privacy standards'
+      ],
+      testimonial: 'I feel completely safe knowing my sensitive health information is protected by such robust security measures.'
     },
     {
       icon: Clock,
-      title: '24/7 Emergency Access',
-      description: 'Instant access to emergency services, real-time ER wait times, urgent care locator, and priority booking.',
-      color: 'from-red-500 to-red-600',
-      stats: '<2min response',
-      benefits: ['Emergency access', 'Real-time wait times', 'Priority booking', 'GPS location services'],
-      details: 'Get immediate access to emergency healthcare services with our 24/7 platform. View real-time emergency room wait times, locate the nearest urgent care facilities, and receive priority booking for critical situations.',
-      image: 'https://images.pexels.com/photos/263402/pexels-photo-263402.jpeg?auto=compress&cs=tinysrgb&w=600&h=400&dpr=2'
+      title: '24/7 Emergency',
+      description: 'Instant access to emergency services and real-time ER wait times.',
+      benefits: ['Emergency access', 'Real-time wait times', 'Priority booking'],
+      color: 'bg-rose-500',
+      detailedDescription: 'Get immediate help when you need it most with our 24/7 emergency services. View real-time emergency room wait times, find the nearest urgent care facilities, and receive priority booking for critical situations.',
+      keyFeatures: [
+        'Live ER wait time monitoring',
+        'Urgent care locator',
+        'Emergency contact routing',
+        'Priority appointment scheduling',
+        'Critical symptom checker'
+      ],
+      testimonial: 'When I had a medical emergency, this feature helped me find the nearest ER with the shortest wait time - it was a lifesaver!'
     },
     {
       icon: Users,
-      title: 'Family Care Management',
-      description: 'Manage health records for your entire family with shared calendars, notifications, and coordinated care.',
-      color: 'from-purple-500 to-purple-600',
-      stats: '5 family members',
-      benefits: ['Family profiles', 'Shared calendars', 'Coordinated care', 'Parental controls'],
-      details: 'Streamline healthcare for your entire family with centralized management tools. Coordinate appointments, share medical information securely, and ensure everyone receives the care they need.',
-      image: 'https://images.pexels.com/photos/4021775/pexels-photo-4021775.jpeg?auto=compress&cs=tinysrgb&w=600&h=400&dpr=2'
+      title: 'Family Care',
+      description: 'Manage health records for your entire family with shared calendars.',
+      benefits: ['Family profiles', 'Shared calendars', 'Coordinated care'],
+      color: 'bg-purple-500',
+      detailedDescription: 'Coordinate healthcare for your entire family in one place. Create individual profiles, manage appointments with a shared calendar, track medications, and ensure everyone receives coordinated care.',
+      keyFeatures: [
+        'Centralized family health dashboard',
+        'Shared medication tracking',
+        'Appointment coordination',
+        'Vaccination records',
+        'Permission-based access control'
+      ],
+      testimonial: 'Managing my family\'s healthcare was overwhelming until I started using Family Care - now everything is organized in one place.'
     },
     {
       icon: Zap,
       title: 'AI Health Assistant',
-      description: 'Personalized health insights, medication reminders, symptom checker, and smart recommendations powered by AI.',
-      color: 'from-yellow-500 to-orange-500',
-      stats: 'Smart recommendations',
-      benefits: ['Health insights', 'Medication reminders', 'Symptom checker', 'Predictive analytics'],
-      details: 'Our AI-powered health assistant provides personalized recommendations, tracks your health metrics, and helps you make informed decisions about your healthcare journey.',
-      image: 'https://images.pexels.com/photos/3845810/pexels-photo-3845810.jpeg?auto=compress&cs=tinysrgb&w=600&h=400&dpr=2'
+      description: 'Personalized health insights and medication reminders powered by AI.',
+      benefits: ['Health insights', 'Medication reminders', 'Symptom checker'],
+      color: 'bg-cyan-500',
+      detailedDescription: 'Our AI-powered health assistant provides personalized insights based on your health data. Receive smart medication reminders, analyze symptoms, and get recommendations for maintaining optimal health.',
+      keyFeatures: [
+        'Personalized health recommendations',
+        'Smart medication scheduling',
+        'Symptom analysis',
+        'Health trend tracking',
+        'Wellness goal setting'
+      ],
+      testimonial: 'The AI assistant reminds me to take my medications and has helped me identify patterns in my health I never noticed before.'
     }
   ];
 
-  const additionalFeatures = [
-    {
-      icon: Smartphone,
-      title: 'Mobile-First Design',
-      description: 'Optimized for mobile devices with offline capabilities and push notifications.'
-    },
-    {
-      icon: Globe,
-      title: 'Multi-Language Support',
-      description: 'Available in Arabic, French, and English with cultural adaptations.'
-    },
-    {
-      icon: Lock,
-      title: 'Privacy Controls',
-      description: 'Granular privacy settings with complete control over your data sharing.'
-    },
-    {
-      icon: Heart,
-      title: 'Wellness Tracking',
-      description: 'Comprehensive health monitoring with integration to wearable devices.'
-    },
-    {
-      icon: Bell,
-      title: 'Smart Notifications',
-      description: 'Intelligent alerts for appointments, medications, and health reminders.'
-    },
-    {
-      icon: BarChart3,
-      title: 'Health Analytics',
-      description: 'Detailed insights into your health trends and progress tracking.'
-    }
-  ];
+  const nextFeature = () => {
+    setActiveIndex((prevIndex) => (prevIndex + 1) % features.length);
+  };
 
-  const testimonials = [
-    {
-      name: 'Dr. Ahmed Benali',
-      role: 'Cardiologist',
-      quote: 'HealthLand has revolutionized how I manage my practice. The security features give me confidence in handling sensitive patient data.',
-      rating: 5
-    },
-    {
-      name: 'Amina Boudiaf',
-      role: 'Patient',
-      quote: 'The family care management feature is incredible. I can easily coordinate healthcare for my entire family from one platform.',
-      rating: 5
-    },
-    {
-      name: 'Karim Mammeri',
-      role: 'Clinic Administrator',
-      quote: 'The analytics and reporting tools have helped us improve our operations significantly. Highly recommended!',
-      rating: 5
-    }
-  ];
+  const prevFeature = () => {
+    setActiveIndex((prevIndex) => (prevIndex - 1 + features.length) % features.length);
+  };
+
+  const openPopup = (index) => {
+    setExpandedFeature(features[index]);
+    setPopupVisible(true);
+    document.body.style.overflow = 'hidden'; // Prevent scrolling when popup is open
+  };
+
+  const closePopup = () => {
+    setPopupVisible(false);
+    document.body.style.overflow = 'auto'; // Re-enable scrolling
+  };
+
+  // Auto-rotate features every 5 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (!popupVisible) {
+        nextFeature();
+      }
+    }, 5000);
+    
+    return () => clearInterval(interval);
+  }, [popupVisible]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white via-neutral-50 to-white">
-      {/* Hero Section */}
-      <section className="bg-gradient-to-br from-primary/10 via-white to-secondary/10 py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 py-20 relative overflow-hidden">
+      {/* Floating background elements */}
+      <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0">
+        {[...Array(8)].map((_, i) => (
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="text-center mb-16"
-          >
-            <div className="inline-flex items-center bg-primary/10 text-primary px-6 py-3 rounded-full text-sm font-inter font-semibold mb-6 shadow-sm">
-              <Award className="w-4 h-4 mr-2" />
-              Award-winning platform • Trusted by 50K+ patients
-            </div>
-            <h1 className="text-4xl md:text-6xl font-jakarta font-bold text-neutral-900 mb-6">
-              Powerful Features for
-              <span className="text-primary"> Modern Healthcare</span>
-            </h1>
-            <p className="text-xl text-gray-600 font-inter max-w-3xl mx-auto leading-relaxed">
-              Discover how HealthLand's comprehensive feature set transforms the healthcare experience 
-              for patients, providers, and administrators alike.
-            </p>
-          </motion.div>
-        </div>
-      </section>
+            key={i}
+            className="absolute rounded-full opacity-5"
+            style={{
+              top: `${Math.random() * 100}%`,
+              left: `${Math.random() * 100}%`,
+              width: `${Math.random() * 200 + 100}px`,
+              height: `${Math.random() * 200 + 100}px`,
+              backgroundColor: '#3b82f6',
+            }}
+            animate={{
+              x: [0, Math.random() * 100 - 50],
+              y: [0, Math.random() * 100 - 50],
+            }}
+            transition={{
+              duration: Math.random() * 10 + 15,
+              repeat: Infinity,
+              repeatType: "reverse",
+            }}
+          />
+        ))}
+      </div>
 
-      {/* Main Features Showcase */}
-      <section className="py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-            {/* Feature Navigation */}
-            <div className="space-y-6">
-              <h2 className="text-3xl font-jakarta font-bold text-neutral-900 mb-8">
-                Core Features
-              </h2>
-              {mainFeatures.map((feature, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, x: -20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
-                  className={`p-6 rounded-2xl cursor-pointer transition-all duration-300 ${
-                    activeFeature === index
-                      ? 'bg-primary/10 border-2 border-primary shadow-lg'
-                      : 'bg-white border border-gray-200 hover:shadow-md'
-                  }`}
-                  onClick={() => setActiveFeature(index)}
-                >
-                  <div className="flex items-start space-x-4">
-                    <div className={`bg-gradient-to-r ${feature.color} p-3 rounded-xl shadow-lg`}>
-                      <feature.icon className="w-6 h-6 text-white" />
+      {/* Medical symbols floating */}
+      <div className="absolute top-1/4 left-1/5 animate-float">
+        <HeartPulse className="w-10 h-10 text-blue-400/30" />
+      </div>
+      <div className="absolute top-1/3 right-1/3 animate-float-delay">
+        <Pill className="w-8 h-8 text-teal-400/30" />
+      </div>
+      <div className="absolute bottom-1/4 left-1/3 animate-float">
+        <Stethoscope className="w-12 h-12 text-indigo-400/30" />
+      </div>
+      <div className="absolute top-1/2 right-1/5 animate-float-delay">
+        <Activity className="w-9 h-9 text-rose-400/30" />
+      </div>
+      
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          className="text-center mb-16"
+        >
+          <div className="inline-flex items-center bg-blue-100 text-blue-600 px-6 py-3 rounded-full text-sm font-medium mb-6 shadow-sm">
+            <div className="w-4 h-4 mr-2 rounded-full bg-blue-600 animate-pulse" />
+            Award-winning platform • Trusted by 50K+ patients
+          </div>
+          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+            Transform Your <span className="text-blue-600">Healthcare Experience</span>
+          </h2>
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+            Our platform combines cutting-edge technology with compassionate care to deliver an unparalleled healthcare journey.
+          </p>
+        </motion.div>
+
+        {/* Desktop Grid Layout */}
+        <div className="hidden lg:grid grid-cols-3 gap-8 mb-12">
+          {features.map((feature, index) => (
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: index * 0.1 }}
+              whileHover={{ y: -10 }}
+              className="group relative"
+            >
+              <div className="bg-white rounded-2xl shadow-lg p-8 h-full flex flex-col border border-gray-100 transition-all duration-300 group-hover:shadow-xl cursor-pointer" onClick={() => openPopup(index)}>
+                <div className={`${feature.color} p-3 rounded-xl w-fit mb-6 group-hover:scale-110 transition-transform duration-300`}>
+                  <feature.icon className="w-8 h-8 text-white" />
+                </div>
+                
+                <h3 className="text-xl font-bold text-gray-900 mb-3">{feature.title}</h3>
+                <p className="text-gray-600 mb-5 flex-grow">{feature.description}</p>
+                
+                <div className="space-y-3 mb-6">
+                  {feature.benefits.map((benefit, idx) => (
+                    <div key={idx} className="flex items-center">
+                      <CheckCircle className="w-5 h-5 text-green-500 mr-3 flex-shrink-0" />
+                      <span className="text-gray-700">{benefit}</span>
                     </div>
-                    <div className="flex-1">
-                      <h3 className="text-lg font-jakarta font-bold text-neutral-900 mb-2">
-                        {feature.title}
-                      </h3>
-                      <p className="text-gray-600 font-inter text-sm leading-relaxed">
-                        {feature.description}
-                      </p>
-                      <div className="flex items-center mt-3">
-                        <Star className="w-4 h-4 text-yellow-500 mr-1" />
-                        <span className="text-sm font-inter font-medium text-gray-700">
-                          {feature.stats}
-                        </span>
+                  ))}
+                </div>
+                
+                <button className="flex items-center text-blue-600 font-medium group-hover:text-blue-700 transition-colors">
+                  Learn more
+                  <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                </button>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+
+        {/* Mobile Carousel */}
+        <div className="lg:hidden">
+          <div className="relative overflow-hidden rounded-3xl">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activeIndex}
+                initial={{ opacity: 0, x: 100 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -100 }}
+                transition={{ duration: 0.5 }}
+                className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100 cursor-pointer" onClick={() => openPopup(activeIndex)}
+              >
+                <div className={`${features[activeIndex].color} p-4 rounded-xl w-fit mb-6`}>
+                  {(() => {
+                    const Icon = features[activeIndex].icon;
+                    return <Icon className="w-8 h-8 text-white" />;
+                  })()}
+                </div>
+                
+                <h3 className="text-2xl font-bold text-gray-900 mb-3">
+                  {features[activeIndex].title}
+                </h3>
+                <p className="text-gray-600 mb-6">
+                  {features[activeIndex].description}
+                </p>
+                
+                <div className="space-y-3 mb-8">
+                  {features[activeIndex].benefits.map((benefit, idx) => (
+                    <div key={idx} className="flex items-center">
+                      <CheckCircle className="w-5 h-5 text-green-500 mr-3 flex-shrink-0" />
+                      <span className="text-gray-700">{benefit}</span>
+                    </div>
+                  ))}
+                </div>
+                
+                <button className="w-full bg-gradient-to-r from-blue-600 to-cyan-600 text-white py-3 rounded-xl font-bold text-lg hover:opacity-90 transition-opacity duration-300 shadow-lg">
+                  Learn More
+                </button>
+              </motion.div>
+            </AnimatePresence>
+            
+            {/* Navigation arrows */}
+            <button 
+              onClick={prevFeature}
+              className="absolute left-4 top-1/2 -translate-y-1/2 bg-white p-3 rounded-full shadow-lg border border-gray-200 z-20 hover:bg-blue-50 transition-colors"
+              aria-label="Previous feature"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+            <button 
+              onClick={nextFeature}
+              className="absolute right-4 top-1/2 -translate-y-1/2 bg-white p-3 rounded-full shadow-lg border border-gray-200 z-20 hover:bg-blue-50 transition-colors"
+              aria-label="Next feature"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          </div>
+
+          {/* Pagination dots */}
+          <div className="flex justify-center mt-8 space-x-2">
+            {features.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => setActiveIndex(index)}
+                className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                  index === activeIndex 
+                    ? 'bg-blue-600 w-8' 
+                    : 'bg-gray-300 hover:bg-gray-400'
+                }`}
+                aria-label={`Go to feature ${index + 1}`}
+              />
+            ))}
+          </div>
+        </div>
+
+        {/* Call to Action */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+          className="text-center mt-16"
+        >
+          <button className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-8 py-4 rounded-xl font-bold text-lg hover:opacity-90 transition-opacity duration-300 shadow-lg shadow-blue-500/20">
+            Get Started Today
+          </button>
+          <p className="mt-4 text-gray-600">
+            Join thousands of patients experiencing better healthcare
+          </p>
+        </motion.div>
+      </div>
+
+      {/* Feature Detail Popup */}
+      <AnimatePresence>
+        {popupVisible && expandedFeature && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              transition={{ duration: 0.3 }}
+              className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto"
+            >
+              <div className="p-8">
+                {/* Header */}
+                <div className="flex justify-between items-start mb-6">
+                  <div className="flex items-center">
+                    <div className={`${expandedFeature.color} p-3 rounded-xl mr-4`}>
+                      <expandedFeature.icon className="w-8 h-8 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-2xl font-bold text-gray-900">{expandedFeature.title}</h3>
+                      <div className="inline-flex items-center bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm font-medium mt-2">
+                        <Star className="w-4 h-4 mr-1 text-yellow-500" />
+                        {expandedFeature.stats}
                       </div>
                     </div>
                   </div>
-                </motion.div>
-              ))}
-            </div>
+                  <button 
+                    onClick={closePopup}
+                    className="p-2 rounded-full hover:bg-gray-100 transition-colors"
+                  >
+                    <X className="w-6 h-6 text-gray-500" />
+                  </button>
+                </div>
 
-            {/* Feature Details */}
-            <div className="lg:sticky lg:top-24">
-              <motion.div
-                key={activeFeature}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
-                className="bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-100"
-              >
-                <div className="relative h-64 overflow-hidden">
-                  <img
-                    src={mainFeatures[activeFeature].image}
-                    alt={mainFeatures[activeFeature].title}
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
-                  <div className="absolute bottom-4 left-4 text-white">
-                    <h3 className="text-2xl font-jakarta font-bold mb-2">
-                      {mainFeatures[activeFeature].title}
-                    </h3>
+                {/* Detailed Content */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <div>
+                    <h4 className="text-lg font-bold text-gray-900 mb-4">Overview</h4>
+                    <p className="text-gray-600 mb-6">{expandedFeature.detailedDescription}</p>
+                    
+                    <h4 className="text-lg font-bold text-gray-900 mb-4">Key Features</h4>
+                    <ul className="space-y-3 mb-8">
+                      {expandedFeature.keyFeatures.map((feature, idx) => (
+                        <li key={idx} className="flex items-start">
+                          <div className="bg-blue-100 w-6 h-6 rounded-full flex items-center justify-center mr-3 mt-0.5">
+                            <CheckCircle className="w-4 h-4 text-blue-600" />
+                          </div>
+                          <span className="text-gray-700">{feature}</span>
+                        </li>
+                      ))}
+                    </ul>
+                    
+                    <div className="bg-blue-50 rounded-xl p-4 border border-blue-100">
+                      <div className="flex items-center">
+                        <div className="bg-gray-200 border-2 border-dashed rounded-xl w-12 h-12" />
+                        <div className="ml-4">
+                          <p className="text-gray-600 italic">"{expandedFeature.testimonial}"</p>
+                          <p className="text-sm text-gray-500 mt-2">- Sarah K., HealthLand User</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <div className="bg-gray-50 rounded-xl p-6 border border-gray-200 mb-6">
+                      <h4 className="text-lg font-bold text-gray-900 mb-4">How It Works</h4>
+                      <div className="space-y-4">
+                        <div className="flex">
+                          <div className="bg-blue-600 text-white w-8 h-8 rounded-full flex items-center justify-center mr-4 flex-shrink-0">1</div>
+                          <p className="text-gray-600">Sign up for a HealthLand account and complete your profile</p>
+                        </div>
+                        <div className="flex">
+                          <div className="bg-blue-600 text-white w-8 h-8 rounded-full flex items-center justify-center mr-4 flex-shrink-0">2</div>
+                          <p className="text-gray-600">Connect with healthcare providers in our network</p>
+                        </div>
+                        <div className="flex">
+                          <div className="bg-blue-600 text-white w-8 h-8 rounded-full flex items-center justify-center mr-4 flex-shrink-0">3</div>
+                          <p className="text-gray-600">Start using the {expandedFeature.title} feature immediately</p>
+                        </div>
+                        <div className="flex">
+                          <div className="bg-blue-600 text-white w-8 h-8 rounded-full flex items-center justify-center mr-4 flex-shrink-0">4</div>
+                          <p className="text-gray-600">Enjoy seamless healthcare management tailored to your needs</p>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <h4 className="text-lg font-bold text-gray-900 mb-4">Benefits</h4>
+                    <div className="grid grid-cols-2 gap-4">
+                      {expandedFeature.benefits.map((benefit, idx) => (
+                        <div key={idx} className="bg-white border border-gray-200 rounded-lg p-4 flex items-center">
+                          <div className="w-3 h-3 rounded-full mr-3" style={{ backgroundColor: expandedFeature.color.replace('bg-', '#') }}></div>
+                          <span className="text-gray-700 text-sm">{benefit}</span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
                 
-                <div className="p-8">
-                  <p className="text-gray-700 font-inter leading-relaxed mb-6 text-lg">
-                    {mainFeatures[activeFeature].details}
-                  </p>
-                  
-                  <div className="space-y-3 mb-6">
-                    <h4 className="font-jakarta font-semibold text-neutral-900">Key Benefits:</h4>
-                    {mainFeatures[activeFeature].benefits.map((benefit, idx) => (
-                      <div key={idx} className="flex items-center text-gray-600">
-                        <CheckCircle className="w-4 h-4 text-green-500 mr-3 flex-shrink-0" />
-                        <span className="font-inter">{benefit}</span>
-                      </div>
-                    ))}
-                  </div>
-                  
-                  <button className="w-full bg-primary text-white py-3 rounded-xl font-inter font-semibold hover:bg-primary/90 transition-colors duration-200 flex items-center justify-center">
-                    Learn More
-                    <ArrowRight className="w-4 h-4 ml-2" />
+                <div className="mt-8 flex justify-end">
+                  <button 
+                    onClick={closePopup}
+                    className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg font-medium mr-4 hover:bg-gray-50 transition-colors"
+                  >
+                    Close
+                  </button>
+                  <button className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-3 rounded-lg font-medium hover:opacity-90 transition-opacity duration-300">
+                    Try This Feature
                   </button>
                 </div>
-              </motion.div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Additional Features Grid */}
-      <section className="py-20 bg-neutral-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-3xl md:text-4xl font-jakarta font-bold text-neutral-900 mb-6">
-              Additional Features
-            </h2>
-            <p className="text-xl text-gray-600 font-inter max-w-3xl mx-auto leading-relaxed">
-              Explore more features designed to enhance your healthcare experience and provide 
-              comprehensive support for all your medical needs.
-            </p>
-          </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {additionalFeatures.map((feature, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
-                className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 group"
-              >
-                <div className="bg-primary/10 p-4 rounded-xl mb-6 w-fit group-hover:scale-110 transition-transform duration-300">
-                  <feature.icon className="w-8 h-8 text-primary" />
-                </div>
-                <h3 className="text-xl font-jakarta font-bold text-neutral-900 mb-4">
-                  {feature.title}
-                </h3>
-                <p className="text-gray-600 font-inter leading-relaxed">
-                  {feature.description}
-                </p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Feature Comparison */}
-      <section className="py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-3xl md:text-4xl font-jakarta font-bold text-neutral-900 mb-6">
-              Why Choose HealthLand?
-            </h2>
-            <p className="text-xl text-gray-600 font-inter max-w-3xl mx-auto leading-relaxed">
-              See how HealthLand compares to traditional healthcare platforms and discover 
-              what makes us the preferred choice for modern healthcare.
-            </p>
-          </motion.div>
-
-          <div className="bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-100">
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-6 py-4 text-left font-jakarta font-bold text-neutral-900">Feature</th>
-                    <th className="px-6 py-4 text-center font-jakarta font-bold text-primary">HealthLand</th>
-                    <th className="px-6 py-4 text-center font-jakarta font-bold text-gray-600">Traditional Platforms</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-200">
-                  <tr>
-                    <td className="px-6 py-4 font-inter font-medium text-gray-900">Real-time Booking</td>
-                    <td className="px-6 py-4 text-center">
-                      <CheckCircle className="w-6 h-6 text-green-500 mx-auto" />
-                    </td>
-                    <td className="px-6 py-4 text-center">
-                      <div className="w-6 h-6 bg-red-100 rounded-full mx-auto flex items-center justify-center">
-                        <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr className="bg-gray-50">
-                    <td className="px-6 py-4 font-inter font-medium text-gray-900">AI-Powered Recommendations</td>
-                    <td className="px-6 py-4 text-center">
-                      <CheckCircle className="w-6 h-6 text-green-500 mx-auto" />
-                    </td>
-                    <td className="px-6 py-4 text-center">
-                      <div className="w-6 h-6 bg-red-100 rounded-full mx-auto flex items-center justify-center">
-                        <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td className="px-6 py-4 font-inter font-medium text-gray-900">Family Care Management</td>
-                    <td className="px-6 py-4 text-center">
-                      <CheckCircle className="w-6 h-6 text-green-500 mx-auto" />
-                    </td>
-                    <td className="px-6 py-4 text-center">
-                      <div className="w-6 h-6 bg-yellow-100 rounded-full mx-auto flex items-center justify-center">
-                        <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr className="bg-gray-50">
-                    <td className="px-6 py-4 font-inter font-medium text-gray-900">24/7 Emergency Access</td>
-                    <td className="px-6 py-4 text-center">
-                      <CheckCircle className="w-6 h-6 text-green-500 mx-auto" />
-                    </td>
-                    <td className="px-6 py-4 text-center">
-                      <div className="w-6 h-6 bg-red-100 rounded-full mx-auto flex items-center justify-center">
-                        <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td className="px-6 py-4 font-inter font-medium text-gray-900">Multi-language Support</td>
-                    <td className="px-6 py-4 text-center">
-                      <CheckCircle className="w-6 h-6 text-green-500 mx-auto" />
-                    </td>
-                    <td className="px-6 py-4 text-center">
-                      <div className="w-6 h-6 bg-yellow-100 rounded-full mx-auto flex items-center justify-center">
-                        <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
-                      </div>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Testimonials */}
-      <section className="py-20 bg-neutral-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-3xl md:text-4xl font-jakarta font-bold text-neutral-900 mb-6">
-              What Our Users Say
-            </h2>
-            <p className="text-xl text-gray-600 font-inter max-w-3xl mx-auto leading-relaxed">
-              Hear from healthcare professionals and patients who have experienced 
-              the power of HealthLand's features firsthand.
-            </p>
-          </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {testimonials.map((testimonial, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
-                className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100"
-              >
-                <div className="flex items-center mb-4">
-                  {[...Array(testimonial.rating)].map((_, i) => (
-                    <Star key={i} className="w-5 h-5 text-yellow-400 fill-current" />
-                  ))}
-                </div>
-                <blockquote className="text-gray-700 font-inter leading-relaxed mb-6">
-                  "{testimonial.quote}"
-                </blockquote>
-                <div>
-                  <div className="font-jakarta font-bold text-neutral-900">{testimonial.name}</div>
-                  <div className="text-gray-600 font-inter text-sm">{testimonial.role}</div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Call to Action */}
-      <section className="py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-            className="bg-gradient-to-r from-primary to-primary/80 rounded-3xl p-8 md:p-12 text-center text-white relative overflow-hidden"
-          >
-            <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-secondary/20 opacity-50"></div>
-            <div className="relative z-10">
-              <h3 className="text-2xl md:text-3xl font-jakarta font-bold mb-4">
-                Experience the Future of Healthcare
-              </h3>
-              <p className="text-lg md:text-xl font-inter mb-8 opacity-90 max-w-2xl mx-auto">
-                Join thousands of patients and healthcare providers who trust HealthLand 
-                for their healthcare needs. Start your journey today.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="bg-white text-primary px-8 py-4 rounded-xl font-inter font-semibold text-lg hover:bg-gray-100 transition-colors duration-300 focus:outline-none focus:ring-4 focus:ring-white/30 shadow-lg"
-                >
-                  Get Started Free
-                </motion.button>
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="border-2 border-white text-white px-8 py-4 rounded-xl font-inter font-semibold text-lg hover:bg-white/10 transition-colors duration-300 focus:outline-none focus:ring-4 focus:ring-white/30 flex items-center justify-center"
-                >
-                  <Play className="w-5 h-5 mr-2" />
-                  Watch Demo
-                </motion.button>
               </div>
-            </div>
-          </motion.div>
-        </div>
-      </section>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
 
-export default FeaturesPage;
+export default FeaturesShowcase;

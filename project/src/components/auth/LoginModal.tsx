@@ -9,6 +9,7 @@ interface LoginModalProps {
   onClose: () => void;
 }
 
+
 const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
   const [isLogin, setIsLogin] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
@@ -178,14 +179,10 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
 
               <div className="mt-8 text-center">
                 <button
-                  onClick={() => {
-                    setIsLogin(!isLogin);
-                    setErrors({});
-                    setFormData({ email: '', password: '' });
-                  }}
+                  onClick={() => setShowRegistration(true)}
                   className="text-primary font-inter font-medium hover:underline"
                 >
-                  {isLogin ? "Don't have an account? Sign up" : 'Already have an account? Sign in'}
+                  {"Don't have an account? Sign up"}
                 </button>
               </div>
 
