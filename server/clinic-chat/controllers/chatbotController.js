@@ -9,6 +9,7 @@ const {
 } = require('../utils/chatbotService');
 const { getLLMReply } = require('../utils/chatbotService');
 const Clinic = require('../models/Clinic');
+const Message = require('../models/Message');
 
 /**
  * Send message to chatbot
@@ -25,11 +26,29 @@ const sendMessage = async (req, res) => {
       });
     }
 
+    // Store user message
+    await Message.create({
+      from: userId,
+      to: 'bot',
+      content: message,
+      timestamp: new Date(),
+      read: true
+    });
+
     if (isEmergency(message)) {
+      const emergencyMsg = getEmergencyResponse();
+      // Store bot emergency response
+      await Message.create({
+        from: 'bot',
+        to: userId,
+        content: emergencyMsg,
+        timestamp: new Date(),
+        read: false
+      });
       return res.status(200).json({
         success: true,
         data: {
-          message: getEmergencyResponse(),
+          message: emergencyMsg,
           isEmergency: true,
           timestamp: new Date().toISOString()
         }
@@ -37,6 +56,15 @@ const sendMessage = async (req, res) => {
     }
 
     const response = await getChatbotResponse(message, userId);
+
+    // Store bot response
+    await Message.create({
+      from: 'bot',
+      to: userId,
+      content: response,
+      timestamp: new Date(),
+      read: false
+    });
 
     res.status(200).json({
       success: true,

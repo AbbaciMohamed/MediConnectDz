@@ -65,7 +65,7 @@ const GeminiChatbot = () => {
     setError('');
     setMessages(prev => [...prev, { id: Date.now().toString(), content: inputMessage, role: 'user', timestamp: new Date(), userId: user?.id }]);
     try {
-      const res = await fetch('/api/clinics/chatbot/message', {
+      const res = await fetch('/api/clinic/chatbot/message', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: inputMessage })
