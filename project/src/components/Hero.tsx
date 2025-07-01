@@ -2,7 +2,11 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { MapPin, ArrowRight, Play, Shield, Clock, Users, Star } from 'lucide-react';
 
-const Hero = () => {
+interface HeroProps {
+  onFindClinicNearMe?: () => void;
+}
+
+const Hero: React.FC<HeroProps> = ({ onFindClinicNearMe }) => {
   const scrollToSearch = () => {
     const searchSection = document.getElementById('clinic-search');
     searchSection?.scrollIntoView({ behavior: 'smooth' });
@@ -64,7 +68,7 @@ const Hero = () => {
               
               <div className="flex flex-col sm:flex-row gap-4 pt-4">
                 <motion.button
-                  onClick={scrollToSearch}
+                  onClick={onFindClinicNearMe || scrollToSearch}
                   whileHover={{ y: -3, scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   initial={{ opacity: 0, y: 20 }}

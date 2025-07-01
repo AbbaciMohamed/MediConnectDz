@@ -6,9 +6,10 @@ interface ClinicAdminProps {
   formData: any;
   setFormData: (data: any) => void;
   errors: Record<string, string>;
+  firstInputRef?: React.RefObject<HTMLInputElement>;
 }
 
-const ClinicAdmin: React.FC<ClinicAdminProps> = ({ formData, setFormData, errors }) => {
+const ClinicAdmin: React.FC<ClinicAdminProps> = ({ formData, setFormData, errors, firstInputRef }) => {
   const [showPassword, setShowPassword] = useState(false);
 
   const validatePassword = (password: string) => {
@@ -66,6 +67,7 @@ const ClinicAdmin: React.FC<ClinicAdminProps> = ({ formData, setFormData, errors
         <div className="relative">
           <Building className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
           <input
+            ref={firstInputRef}
             type="text"
             required
             value={formData.clinicName || ''}

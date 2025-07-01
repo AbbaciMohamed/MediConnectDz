@@ -6,12 +6,14 @@ interface SupplierCertificationsProps {
   formData: any;
   setFormData: (data: any) => void;
   errors: Record<string, string>;
+  firstInputRef?: React.RefObject<HTMLInputElement>;
 }
 
 const SupplierCertifications: React.FC<SupplierCertificationsProps> = ({ 
   formData, 
   setFormData, 
-  errors 
+  errors,
+  firstInputRef
 }) => {
   const handleFileUpload = (files: FileList | null) => {
     if (!files) return;

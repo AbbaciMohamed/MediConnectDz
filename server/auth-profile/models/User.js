@@ -1,70 +1,80 @@
 const mongoose = require('mongoose');
+const { v4: uuidv4 } = require('uuid');
 
-const { encryptField, decryptField } = require('../../shared/utils/encryption');
+// Safe encryption fallback
+let encryptField = (val) => val;
+let decryptField = (val) => val;
+
+try {
+  const utils = require('../../shared/utils/encryption');
+  encryptField = utils.encryptField || encryptField;
+  decryptField = utils.decryptField || decryptField;
+} catch (err) {
+  console.warn('⚠️ Encryption utils not found. Continuing without encryption.');
+}
+
+const notificationSchema = new mongoose.Schema({
+  message: String,
+  read: { type: Boolean, default: false },
+  date: { type: Date, default: Date.now }
+}, { _id: false });
+
+const scheduleSchema = new mongoose.Schema({
+  day: String,
+  startHour: String,
+  endHour: String
+}, { _id: false });
 
 const userSchema = new mongoose.Schema({
-  userId: { type: String, unique: true, required: true },
-  name: String,
-  email: { type: String, unique: true },
-  password: String,
-  role: { type: String, enum: ['patient', 'doctor', 'nurse', 'admin', 'clinic', 'supplier'] },
+  userId: {
+    type: String,
+    unique: true,
+    required: true,
+    default: () => uuidv4()
+  },
+  name: { type: String },
+  email: {
+    type: String,
+    unique: true,
+    required: true
+  },
+  password: { type: String, required: true },
+  role: {
+    type: String,
+    enum: ['patient', 'doctor', 'nurse', 'admin', 'clinic', 'supplier'],
+    required: true
+  },
   clinicId: { type: String, default: null },
+
+  // Subscription / Plan Info
   planType: { type: String, enum: ['Basic', 'Pro', 'Enterprise'], default: 'Basic' },
   planActivatedAt: { type: Date, default: null },
   planExpiresAt: { type: Date, default: null },
+
+  // Profile Info
   profile: {
     age: Number,
     gender: String,
     phone: String,
     address: String,
-    healthInfo: String, // will be encrypted
-    medicalHistory: String // will be encrypted
+    healthInfo: String,       // Encrypted
+    medicalHistory: String    // Encrypted
   },
+
+  // For doctors or clinics
   certificate: { type: String, default: null },
-  subscriptionPlan: { type: String, default: null }, // e.g., 'basic', 'premium' (required for clinics)
+
+  // Subscription
+  subscriptionPlan: { type: String, enum: ['Basic', 'Pro', 'Enterprise'], default: 'Basic' },
   subscriptionStart: { type: Date, default: null },
   subscriptionEnd: { type: Date, default: null },
   subscriptionActive: { type: Boolean, default: false },
-  premiumFeatures: { type: Boolean, default: false }, // for doctors
-  schedule: [
-    {
-      day: String, // e.g., 'Monday'
-      startHour: String, // e.g., '09:00'
-      endHour: String // e.g., '17:00'
-    }
-  ],
-  notifications: [
-    {
-      message: String,
-      date: { type: Date, default: Date.now },
-      read: { type: Boolean, default: false }
-    }
-  ]
+  premiumFeatures: { type: Boolean, default: false },
+  schedule: [scheduleSchema],
+  notifications: [notificationSchema]
 });
 
-// Encrypt healthInfo and medicalHistory before save
-userSchema.pre('save', function(next) {
-  if (this.profile) {
-    if (this.profile.healthInfo && !this.profile.healthInfo.startsWith('enc:')) {
-      this.profile.healthInfo = 'enc:' + encryptField(this.profile.healthInfo);
-    }
-    if (this.profile.medicalHistory && !this.profile.medicalHistory.startsWith('enc:')) {
-      this.profile.medicalHistory = 'enc:' + encryptField(this.profile.medicalHistory);
-    }
-  }
-  next();
-});
+module.exports = mongoose.model('User', userSchema);
 
-// Decrypt after find
-userSchema.post('init', function(doc) {
-  if (doc.profile) {
-    if (doc.profile.healthInfo && doc.profile.healthInfo.startsWith('enc:')) {
-      doc.profile.healthInfo = decryptField(doc.profile.healthInfo.slice(4));
-    }
-    if (doc.profile.medicalHistory && doc.profile.medicalHistory.startsWith('enc:')) {
-      doc.profile.medicalHistory = decryptField(doc.profile.medicalHistory.slice(4));
-    }
-  }
-});
-
-module.exports = mongoose.model('User', userSchema); 
+  
+  

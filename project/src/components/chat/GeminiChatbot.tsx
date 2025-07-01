@@ -13,6 +13,7 @@ const GeminiChatbot = () => {
   const [userRole, setUserRole] = useState<'patient' | 'clinic' | 'supplier' | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { user } = useAuth();
+  const [error, setError] = useState('');
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -58,29 +59,18 @@ const GeminiChatbot = () => {
     return prompts[role as keyof typeof prompts] || prompts.patient;
   };
 
-  const handleSendMessage = async () => {
+  const sendMessage = async () => {
     if (!inputMessage.trim()) return;
-
-    const newMessage: ChatMessage = {
-      id: Date.now().toString(),
-      content: inputMessage,
-      role: 'user',
-      timestamp: new Date(),
-      userId: user?.id
-    };
-
-    setMessages(prev => [...prev, newMessage]);
-    setInputMessage('');
     setIsLoading(true);
-
+    setError('');
+    setMessages(prev => [...prev, { id: Date.now().toString(), content: inputMessage, role: 'user', timestamp: new Date(), userId: user?.id }]);
     try {
-      // Call backend chatbot endpoint
-      const response = await fetch('http://localhost:5000/api/clinic/chatbot/message', {
+      const res = await fetch('/api/clinics/chatbot/message', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: inputMessage })
       });
-      const data = await response.json();
+      const data = await res.json();
       let botContent = "I'm sorry, I'm having trouble responding right now. Please try again in a moment.";
       if (data && data.success && data.data && data.data.message) {
         botContent = data.data.message;
@@ -89,21 +79,15 @@ const GeminiChatbot = () => {
         id: (Date.now() + 1).toString(),
         content: botContent,
         role: 'assistant',
-        timestamp: new Date()
+        timestamp: new Date(),
+        userId: user?.id
       };
       setMessages(prev => [...prev, botMessage]);
-    } catch (error) {
-      console.error('Chat error:', error);
-      const errorMessage: ChatMessage = {
-        id: (Date.now() + 1).toString(),
-        content: "I'm sorry, I'm having trouble responding right now. Please try again in a moment.",
-        role: 'assistant',
-        timestamp: new Date()
-      };
-      setMessages(prev => [...prev, errorMessage]);
-    } finally {
-      setIsLoading(false);
+    } catch (err) {
+      setError('Failed to get reply.');
     }
+    setIsLoading(false);
+    setInputMessage('');
   };
 
   const handleQuickReply = (reply: string) => {
@@ -254,13 +238,13 @@ const GeminiChatbot = () => {
                       type="text"
                       value={inputMessage}
                       onChange={(e) => setInputMessage(e.target.value)}
-                      onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+                      onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
                       placeholder="Type your message..."
                       className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary font-inter text-sm"
                       disabled={isLoading}
                     />
                     <button
-                      onClick={handleSendMessage}
+                      onClick={sendMessage}
                       disabled={isLoading || !inputMessage.trim()}
                       className="bg-primary text-white p-2 rounded-lg hover:bg-primary/90 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary/30 disabled:opacity-50"
                       aria-label="Send message"

@@ -1,5 +1,6 @@
 const Appointment = require('../models/Appointment');
 const User = require('../models/User');
+const notificationController = require('./notificationController');
 
 const bookAppointment = async (req, res) => {
   try {
@@ -30,6 +31,8 @@ const bookAppointment = async (req, res) => {
       read: false
     });
     await doctor.save();
+    await notificationController.notifyBooking(req.user.userId, doctor.name, bookingDate);
+    await notificationController.notifyBooking(doctorId, req.user.name, bookingDate);
     res.status(201).json({ message: 'Appointment booked', appointment });
   } catch (err) {
     res.status(400).json({ message: 'Booking error', error: err.message });

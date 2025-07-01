@@ -1,6 +1,7 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { OrgProvider } from './contexts/OrgContext';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import GeminiChatbot from './components/chat/GeminiChatbot';
@@ -19,6 +20,9 @@ import FeaturesPage from './pages/FeaturesPage';
 import AboutPage from './pages/AboutPage';
 import HowItWorksPage from './pages/HowItWorksPage';
 import TestimonialsPage from './pages/TestimonialsPage';
+import AdminAnalyticsPage from './pages/AdminAnalyticsPage';
+import ResellerLandingPage from './pages/ResellerLandingPage';
+import NotificationsPage from './pages/NotificationsPage';
 
 const HomePage = () => (
   <main>
@@ -31,6 +35,12 @@ const HomePage = () => (
 
 const AppContent = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
+
+  // Handler for the Hero button
+  const handleFindClinicNearMe = () => {
+    navigate('/find-clinics', { state: { triggerLocation: true } });
+  };
 
   return (
     <div className="min-h-screen bg-white">
@@ -39,7 +49,7 @@ const AppContent = () => {
         {/* If user is logged in, show profile as default */}
         <Route 
           path="/" 
-          element={user ? <ProfileRouter /> : <HomePage />} 
+          element={user ? <ProfileRouter /> : <Hero onFindClinicNearMe={handleFindClinicNearMe} />} 
         />
         
         {/* Independent pages */}
@@ -49,6 +59,9 @@ const AppContent = () => {
         <Route path="/about" element={<AboutPage />} />
         <Route path="/how-it-works" element={<HowItWorksPage />} />
         <Route path="/testimonials" element={<TestimonialsPage />} />
+        <Route path="/admin/analytics" element={<AdminAnalyticsPage />} />
+        <Route path="/partners" element={<ResellerLandingPage />} />
+        <Route path="/notifications" element={<NotificationsPage />} />
         
         {/* Profile routes */}
         <Route path="/profile" element={<ProfileRouter />} />
@@ -62,11 +75,13 @@ const AppContent = () => {
 
 function App() {
   return (
-    <AuthProvider>
-      <Router>
-        <AppContent />
-      </Router>
-    </AuthProvider>
+    <OrgProvider>
+      <AuthProvider>
+        <Router>
+          <AppContent />
+        </Router>
+      </AuthProvider>
+    </OrgProvider>
   );
 }
 

@@ -37,4 +37,33 @@ router.get('/', async (req, res) => {
   }
 });
 
+// POST /api/nearby-clinics - find clinics near given coordinates
+router.post('/nearby-clinics', async (req, res) => {
+  try {
+    const { latitude, longitude } = req.body;
+    if (typeof latitude !== 'number' || typeof longitude !== 'number') {
+      return res.status(400).json({ message: 'Latitude and longitude are required and must be numbers.' });
+    }
+    const clinics = await Clinic.find({
+      mapCoordinates: {
+        $near: {
+          $geometry: { type: 'Point', coordinates: [longitude, latitude] },
+          $maxDistance: 50000 // 50km radius
+        }
+      }
+    }).limit(20);
+    res.json(clinics);
+  } catch (err) {
+    res.status(500).json({ message: 'Error finding nearby clinics', error: err.message });
+  }
+});
+
+// POST /api/request-location - instruct frontend to request location permission
+router.post('/request-location', (req, res) => {
+  res.json({
+    action: 'request_location',
+    message: 'Please enable location to find clinics near you.'
+  });
+});
+
 module.exports = router; 

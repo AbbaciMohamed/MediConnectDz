@@ -6,9 +6,10 @@ interface SupplierTermsProps {
   formData: any;
   setFormData: (data: any) => void;
   errors: Record<string, string>;
+  firstInputRef?: React.RefObject<HTMLInputElement>;
 }
 
-const SupplierTerms: React.FC<SupplierTermsProps> = ({ formData, setFormData, errors }) => {
+const SupplierTerms: React.FC<SupplierTermsProps> = ({ formData, setFormData, errors, firstInputRef }) => {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}

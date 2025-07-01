@@ -2,6 +2,60 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, MapPin, Calendar, Star, Filter, Clock, Phone, Navigation, Heart, Shield, Award, Users, ChevronDown, SlidersHorizontal, X } from 'lucide-react';
 import logo2 from '../assets/logo2.png';
+import { useLocation } from 'react-router-dom';
+
+interface Clinic {
+  id: number;
+  name: string;
+  specialty: string;
+  rating: number;
+  reviewCount: number;
+  distance: string;
+  waitTime: string;
+  isOpen: boolean;
+  isEmergency: boolean;
+  phone: string;
+  address: string;
+  image: string;
+  services: string[];
+  acceptsInsurance: boolean;
+  isVerified: boolean;
+  isFeatured: boolean;
+  price: string;
+  location: string;
+  openingHours: string;
+}
+
+const initialClinics: Clinic[] = [
+  // ... (copy the mockClinics array here)
+];
+
+// Modal component
+const LocationModal = ({ open, message, onAllow, onCancel }: { open: boolean, message: string, onAllow: () => void, onCancel: () => void }) => {
+  if (!open) return null;
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+      <div className="bg-white rounded-2xl shadow-xl p-8 max-w-sm w-full text-center">
+        <h2 className="text-xl font-bold mb-4">Location Permission</h2>
+        <p className="mb-6 text-gray-700">{message}</p>
+        <div className="flex justify-center gap-4">
+          <button
+            onClick={onAllow}
+            className="bg-primary text-white px-6 py-2 rounded-lg font-semibold hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary"
+          >
+            Allow
+          </button>
+          <button
+            onClick={onCancel}
+            className="bg-gray-200 text-gray-700 px-6 py-2 rounded-lg font-semibold hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const ClinicSearchPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -13,151 +67,31 @@ const ClinicSearchPage = () => {
   const [isLocationDetecting, setIsLocationDetecting] = useState(false);
   const [showResults, setShowResults] = useState(true);
   const [showFilters, setShowFilters] = useState(false);
+  const [clinics, setClinics] = useState<Clinic[]>(initialClinics);
+  const [locationError, setLocationError] = useState<string | null>(null);
+  const [showLocationModal, setShowLocationModal] = useState(false);
+  const [locationPromptMsg, setLocationPromptMsg] = useState('');
 
-  const mockClinics = [
-    { 
-      id: 1,
-      name: 'Algiers Medical Center', 
-      specialty: 'General Medicine', 
-      rating: 4.8, 
-      reviewCount: 324,
-      distance: '0.5 km',
-      waitTime: '15 min',
-      isOpen: true,
-      isEmergency: true,
-      phone: '+213 21 123 456',
-      address: '123 Rue Didouche Mourad, Algiers',
-      image: 'https://images.pexels.com/photos/263402/pexels-photo-263402.jpeg?auto=compress&cs=tinysrgb&w=400&h=250&dpr=2',
-      services: ['Emergency Care', 'General Consultation', 'Lab Tests', 'Radiology'],
-      acceptsInsurance: true,
-      isVerified: true,
-      isFeatured: true,
-      price: '2,500 DZD',
-      location: 'Algiers',
-      openingHours: '24/7'
-    },
-    { 
-      id: 2,
-      name: 'Cardiology Clinic Oran', 
-      specialty: 'Cardiology', 
-      rating: 4.9, 
-      reviewCount: 156,
-      distance: '1.2 km',
-      waitTime: '25 min',
-      isOpen: true,
-      isEmergency: false,
-      phone: '+213 41 987 654',
-      address: '456 Boulevard de la Revolution, Oran',
-      image: 'https://images.pexels.com/photos/236380/pexels-photo-236380.jpeg?auto=compress&cs=tinysrgb&w=400&h=250&dpr=2',
-      services: ['Cardiology', 'ECG', 'Stress Testing', 'Echocardiography'],
-      acceptsInsurance: true,
-      isVerified: true,
-      isFeatured: false,
-      price: '4,000 DZD',
-      location: 'Oran',
-      openingHours: '8:00 AM - 6:00 PM'
-    },
-    { 
-      id: 3,
-      name: 'Pediatric Care Constantine', 
-      specialty: 'Pediatrics', 
-      rating: 4.7, 
-      reviewCount: 89,
-      distance: '2.1 km',
-      waitTime: '10 min',
-      isOpen: true,
-      isEmergency: false,
-      phone: '+213 31 555 789',
-      address: '789 Rue Ben Badis, Constantine',
-      image: 'https://images.pexels.com/photos/4021775/pexels-photo-4021775.jpeg?auto=compress&cs=tinysrgb&w=400&h=250&dpr=2',
-      services: ['Pediatrics', 'Vaccinations', 'Child Development', 'Nutrition'],
-      acceptsInsurance: false,
-      isVerified: true,
-      isFeatured: false,
-      price: '3,200 DZD',
-      location: 'Constantine',
-      openingHours: '9:00 AM - 5:00 PM'
-    },
-    { 
-      id: 4,
-      name: 'Dental Excellence Clinic', 
-      specialty: 'Dentistry', 
-      rating: 4.6, 
-      reviewCount: 203,
-      distance: '1.8 km',
-      waitTime: '20 min',
-      isOpen: true,
-      isEmergency: false,
-      phone: '+213 21 444 555',
-      address: '321 Avenue Pasteur, Algiers',
-      image: 'https://images.pexels.com/photos/3845810/pexels-photo-3845810.jpeg?auto=compress&cs=tinysrgb&w=400&h=250&dpr=2',
-      services: ['General Dentistry', 'Orthodontics', 'Cosmetic Dentistry', 'Oral Surgery'],
-      acceptsInsurance: true,
-      isVerified: true,
-      isFeatured: true,
-      price: '2,800 DZD',
-      location: 'Algiers',
-      openingHours: '8:00 AM - 7:00 PM'
-    },
-    { 
-      id: 5,
-      name: 'Dermatology Specialists Annaba', 
-      specialty: 'Dermatology', 
-      rating: 4.5, 
-      reviewCount: 142,
-      distance: '3.2 km',
-      waitTime: '30 min',
-      isOpen: true,
-      isEmergency: false,
-      phone: '+213 38 777 888',
-      address: '654 Rue de la Liberté, Annaba',
-      image: 'https://images.pexels.com/photos/5327585/pexels-photo-5327585.jpeg?auto=compress&cs=tinysrgb&w=400&h=250&dpr=2',
-      services: ['Dermatology', 'Skin Cancer Screening', 'Cosmetic Procedures', 'Acne Treatment'],
-      acceptsInsurance: true,
-      isVerified: true,
-      isFeatured: false,
-      price: '3,500 DZD',
-      location: 'Annaba',
-      openingHours: '9:00 AM - 6:00 PM'
-    },
-    { 
-      id: 6,
-      name: 'Orthopedic Center Blida', 
-      specialty: 'Orthopedics', 
-      rating: 4.4, 
-      reviewCount: 98,
-      distance: '4.5 km',
-      waitTime: '45 min',
-      isOpen: false,
-      isEmergency: false,
-      phone: '+213 25 333 444',
-      address: '987 Boulevard Boumediene, Blida',
-      image: 'https://images.pexels.com/photos/4386467/pexels-photo-4386467.jpeg?auto=compress&cs=tinysrgb&w=400&h=250&dpr=2',
-      services: ['Orthopedics', 'Sports Medicine', 'Joint Replacement', 'Physical Therapy'],
-      acceptsInsurance: true,
-      isVerified: true,
-      isFeatured: false,
-      price: '4,500 DZD',
-      location: 'Blida',
-      openingHours: '8:00 AM - 4:00 PM'
+  const location = useLocation();
+
+  useEffect(() => {
+    if (location.state && location.state.triggerLocation) {
+      handleFindClinicNearMe();
     }
-  ];
+    // eslint-disable-next-line
+  }, []);
 
   const filters = [
-    { id: 'all', label: 'All Clinics', count: mockClinics.length, icon: Users },
-    { id: 'emergency', label: 'Emergency', count: mockClinics.filter(c => c.isEmergency).length, icon: Clock },
-    { id: 'open', label: 'Open Now', count: mockClinics.filter(c => c.isOpen).length, icon: Calendar },
-    { id: 'insurance', label: 'Accepts Insurance', count: mockClinics.filter(c => c.acceptsInsurance).length, icon: Shield },
-    { id: 'featured', label: 'Featured', count: mockClinics.filter(c => c.isFeatured).length, icon: Award }
+    { id: 'all', label: 'All Clinics', count: clinics.length, icon: Users },
+    { id: 'emergency', label: 'Emergency', count: clinics.filter(c => c.isEmergency).length, icon: Clock },
+    { id: 'open', label: 'Open Now', count: clinics.filter(c => c.isOpen).length, icon: Calendar },
+    { id: 'insurance', label: 'Accepts Insurance', count: clinics.filter(c => c.acceptsInsurance).length, icon: Shield },
+    { id: 'featured', label: 'Featured', count: clinics.filter(c => c.isFeatured).length, icon: Award }
   ];
 
   const locations = [
     { id: 'all', label: 'All Locations' },
-    { id: 'Algiers', label: 'Algiers' },
-    { id: 'Oran', label: 'Oran' },
-    { id: 'Constantine', label: 'Constantine' },
-    { id: 'Annaba', label: 'Annaba' },
-    { id: 'Blida', label: 'Blida' }
+    ...Array.from(new Set(clinics.map(c => c.location))).filter(Boolean).map(loc => ({ id: loc, label: loc }))
   ];
 
   const specialties = [
@@ -203,10 +137,26 @@ const ClinicSearchPage = () => {
     }
   };
 
-  const detectLocation = async () => {
+  const handleFindClinicNearMe = async () => {
+    // Step 1: Ask backend if location is needed
+    try {
+      const response = await fetch('http://localhost:5000/api/clinics/request-location', { method: 'POST' });
+      const data = await response.json();
+      if (data.action === 'request_location') {
+        setLocationPromptMsg(data.message);
+        setShowLocationModal(true);
+      }
+    } catch (err) {
+      setLocationError('Failed to initiate location request.');
+    }
+  };
+
+  const handleAllowLocation = () => {
+    setShowLocationModal(false);
     setIsLocationDetecting(true);
+    setLocationError(null);
     if (!navigator.geolocation) {
-      alert('Geolocation is not supported by your browser.');
+      setLocationError('Geolocation is not supported by your browser.');
       setIsLocationDetecting(false);
       return;
     }
@@ -214,26 +164,34 @@ const ClinicSearchPage = () => {
       async (position) => {
         const { latitude, longitude } = position.coords;
         try {
-          const response = await fetch(`http://localhost:5000/api/clinics?lat=${latitude}&lng=${longitude}`);
-          const clinics = await response.json();
-          // You may want to update a clinics state variable here
-          // setClinics(clinics);
-          setSearchQuery('Clinics near you');
-          setSuggestions([]);
-          setShowResults(true);
+          const response = await fetch('http://localhost:5000/api/clinics/nearby-clinics', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ latitude, longitude })
+          });
+          if (!response.ok) throw new Error('No clinics found nearby.');
+          const clinicsData = await response.json();
+          if (clinicsData.length === 0) {
+            setLocationError('No clinics found near your location.');
+          } else {
+            setClinics(clinicsData);
+            setSearchQuery('Clinics near you');
+            setSuggestions([]);
+            setShowResults(true);
+          }
         } catch (error) {
-          alert('Failed to fetch clinics near you.');
+          setLocationError('Failed to fetch clinics near you.');
         }
         setIsLocationDetecting(false);
       },
       (error) => {
-        alert('Location access denied. Please enable location services.');
+        setLocationError('Location access denied. Please enable location services.');
         setIsLocationDetecting(false);
       }
     );
   };
 
-  const filteredClinics = mockClinics.filter(clinic => {
+  const filteredClinics = clinics.filter(clinic => {
     const matchesSearch = searchQuery === '' || 
       clinic.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       clinic.specialty.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -273,6 +231,25 @@ const ClinicSearchPage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-neutral-50">
+      {/* Location Modal */}
+      <LocationModal
+        open={showLocationModal}
+        message={locationPromptMsg}
+        onAllow={handleAllowLocation}
+        onCancel={() => setShowLocationModal(false)}
+      />
+      {/* Error Toast */}
+      {locationError && (
+        <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-red-500 text-white px-6 py-3 rounded shadow-lg z-50">
+          {locationError}
+        </div>
+      )}
+      {/* Loading Spinner */}
+      {isLocationDetecting && (
+        <div className="fixed inset-0 z-40 flex items-center justify-center bg-black bg-opacity-20">
+          <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+        </div>
+      )}
       {/* Hero Section */}
       <section className="bg-gradient-to-br from-primary/10 via-white to-secondary/10 py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -317,7 +294,7 @@ const ClinicSearchPage = () => {
                 </div>
                 <div className="flex border-t lg:border-t-0 lg:border-l border-gray-200">
                   <button
-                    onClick={detectLocation}
+                    onClick={handleFindClinicNearMe}
                     disabled={isLocationDetecting}
                     className="bg-primary text-white px-8 py-6 hover:bg-primary/90 transition-colors duration-200 focus:outline-none focus:ring-4 focus:ring-primary/30 flex items-center disabled:opacity-50 min-w-[140px]"
                     aria-label="Detect current location"

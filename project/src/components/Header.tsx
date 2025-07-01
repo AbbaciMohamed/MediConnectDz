@@ -4,6 +4,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { Menu, X, Plus, Heart, MapPin, User, LogOut, Bell, Settings } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import LoginModal from './auth/LoginModal';
+import { useOrg } from '../contexts/OrgContext';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -11,6 +12,7 @@ const Header = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const { orgBranding, orgName } = useOrg();
 
   const navItems = [
     { name: 'Home', href: '/' },
@@ -56,7 +58,7 @@ const Header = () => {
                   <Heart className="w-7 h-7 text-primary transform translate-x-2 translate-y-2" />
                 </div>
                 <span className="ml-4 text-2xl font-jakarta font-bold text-neutral-900">
-                  HealthLand
+                  {orgName || 'HealthLand'}
                 </span>
               </motion.div>
             </div>

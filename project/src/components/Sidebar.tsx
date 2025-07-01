@@ -1,8 +1,9 @@
 import React, { useState, useRef } from 'react';
-import { Home, User, Calendar, Hospital, ClipboardList, Users, BarChart, Shield, MessageCircle, Bot, FileText, Settings, ChevronLeft, ChevronRight, Menu } from 'lucide-react';
+import { Home, User, Calendar, Hospital, ClipboardList, Users, BarChart, Shield, MessageCircle, Bot, FileText, Settings, ChevronLeft, ChevronRight, Menu, Bell } from 'lucide-react';
 import logo from '../assets/logo.png';
 import { useAuth } from '../contexts/AuthContext';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { useOrg } from '../contexts/OrgContext';
 
 const navItems = [
   { icon: <Home size={20} />, label: 'Dashboard', path: '/dashboard', roles: ['all'] },
@@ -17,6 +18,7 @@ const navItems = [
   { icon: <Bot size={20} />, label: 'AI Assistant', path: '/ai-assistant', roles: ['all'] },
   { icon: <FileText size={20} />, label: 'Billing & Plans', path: '/billing', roles: ['clinic'] },
   { icon: <Settings size={20} />, label: 'Settings', path: '/settings', roles: ['all'] },
+  { icon: <Bell size={20} />, label: 'Notifications', path: '/notifications', roles: ['all'] },
 ];
 
 const Sidebar = () => {
@@ -28,6 +30,7 @@ const Sidebar = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const navRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const { orgBranding, orgName } = useOrg();
 
   const filteredNav = navItems.filter(item => item.roles.includes('all') || item.roles.includes(userRole));
 
@@ -64,8 +67,8 @@ const Sidebar = () => {
         <div className="flex items-center px-4 pt-4 pb-6 mb-6 cursor-pointer" onClick={() => navigate('/')}
           tabIndex={0} aria-label="Go to home" onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && navigate('/')}
         >
-          <img src={logo} alt="Logo" className={`h-10 w-10 transition-transform ${!collapsed ? 'mr-3' : ''} hover:scale-105`} />
-          {!collapsed && <span className="font-bold text-lg tracking-wide">HealthLand</span>}
+          <img src={orgBranding?.logo || logo} alt="Logo" className={`h-10 w-10 transition-transform ${!collapsed ? 'mr-3' : ''} hover:scale-105`} />
+          {!collapsed && <span className="font-bold text-lg tracking-wide">{orgName || 'HealthLand'}</span>}
         </div>
         <nav className="flex-1 overflow-y-auto px-2 space-y-1" aria-label="Sidebar navigation">
           {filteredNav.map((item, idx) => (
@@ -109,8 +112,8 @@ const Sidebar = () => {
         <div className="fixed inset-0 z-50 bg-black/40" onClick={() => setMobileOpen(false)}>
           <div className="absolute top-0 left-0 h-full w-[250px] bg-[#f8f9fa] shadow-md border-r border-[#e0e0e0] flex flex-col" onClick={e => e.stopPropagation()} role="navigation" aria-label="Mobile sidebar navigation">
             <div className="flex items-center px-4 pt-4 pb-6 mb-6 cursor-pointer" onClick={() => { navigate('/'); setMobileOpen(false); }} tabIndex={0} aria-label="Go to home" onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && navigate('/')}>
-              <img src={logo} alt="Logo" className="h-10 w-10 mr-3" />
-              <span className="font-bold text-lg tracking-wide">HealthLand</span>
+              <img src={orgBranding?.logo || logo} alt="Logo" className="h-10 w-10 mr-3" />
+              <span className="font-bold text-lg tracking-wide">{orgName || 'HealthLand'}</span>
             </div>
             <nav className="flex-1 overflow-y-auto px-2 space-y-1" aria-label="Sidebar navigation">
               {filteredNav.map((item, idx) => (

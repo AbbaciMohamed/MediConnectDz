@@ -1,23 +1,35 @@
 const express = require('express');
 const router = express.Router();
 const { body } = require('express-validator');
-const chatbotController = require('../controllers/chatbotController');
-const { validateRequest } = require('../../shared/middleware/validation');
-const { authenticateToken } = require('../../shared/middleware/auth');
 
-// Send message to chatbot (public endpoint - no authentication required)
+const {
+  chatbotMessage,
+  getStatus,
+  History,
+  deleteHistory,
+  sendMessage
+
+
+} = require  ('../controllers/chatbotController')
+const { validateRequest } = require('../../shared/middleware/validation');
+
+// ✅ POST /api/clinic/chatbot/message (basic message, public)
 router.post('/message', [
   body('message').notEmpty().trim().isLength({ min: 1, max: 1000 }),
   validateRequest
-], chatbotController.sendMessage);
+], sendMessage);
 
-// Get chatbot status (public endpoint)
-router.get('/status', chatbotController.getStatus);
+// ✅ POST /api/clinic/chatbot/smart-message (LLM-based intent classifier)
+router.post('/smart-message', chatbotMessage);
 
-// Get conversation history (authenticated)
-router.get('/history', authenticateToken, chatbotController.getHistory);
+// ✅ GET /api/clinic/chatbot/status (public)
+router.get('/status',getStatus);
 
-// Clear conversation history (authenticated)
-router.delete('/history', authenticateToken, chatbotController.clearHistory);
 
-module.exports = router; 
+// ✅ GET /api/clinic/chatbot/history (auth required)
+router.get('/gethistory', History);
+
+// ✅ DELETE /api/clinic/chatbot/history (auth required)
+router.delete('delete/history',deleteHistory);
+
+module.exports = router;
