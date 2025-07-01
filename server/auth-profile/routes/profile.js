@@ -11,7 +11,7 @@ router.post('/access-with-key', auth, accessWithKey);
 
 const { body } = require('express-validator');
 const profileController = require('../controllers/profileController');
-const { validateRequest } = require('../../middleware/validation');
+const { validateRequest } = require('../../../shared/middleware/validation');
 const { authenticateToken } = require('../../middleware/auth');
 
 // Get user profile
