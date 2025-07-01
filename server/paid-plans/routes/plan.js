@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const planController = require('../controllers/planController');
-const auth = require('../../shared/middleware/auth');
+const auth = require('../../middleware/auth');
 
 // Get current user's plan
 router.get('/me', auth, planController.getMyPlan);

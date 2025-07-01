@@ -3,7 +3,17 @@ import { motion } from 'framer-motion';
 import { MapPin, ArrowRight, Shield, Clock, Users } from 'lucide-react';
 import logo from '../assets/Logo.png';
 
-const Hero: React.FC = () => {
+const Hero = () => {
+  const scrollToSearch = () => {
+    const searchSection = document.getElementById('clinic-search');
+    searchSection?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const scrollToHowItWorks = () => {
+    const howItWorksSection = document.getElementById('how-it-works');
+    howItWorksSection?.scrollIntoView({ behavior: 'smooth' });
+  };
+
   return (
     <section id="home" className="relative bg-gradient-to-br from-white via-primary/5 to-secondary/5 py-10 md:py-20 overflow-hidden">
       {/* Background Elements */}

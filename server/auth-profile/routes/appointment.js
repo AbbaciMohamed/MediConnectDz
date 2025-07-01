@@ -1,6 +1,6 @@
 const express = require('express');
 const { bookAppointment, listAppointments } = require('../controllers/appointmentController');
-const auth = require('../../shared/middleware/auth');
+const auth = require('../../middleware/auth');
 const router = express.Router();
 
 router.post('/book', auth, bookAppointment);
