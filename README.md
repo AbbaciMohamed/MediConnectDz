@@ -63,7 +63,7 @@ HealthCareConnect/
 ### Clone and Run
 
 # 1. Clone the repository
-git clone https://github.com/your-username/MediConnectDz.git
+git clone https://github.com/AbbaciMohamed/MediConnectDz.git
 cd MediConnectDz
 
 # 2. Install backend dependencies
