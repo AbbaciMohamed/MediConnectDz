@@ -59,6 +59,7 @@ app.use('/api/orgs', require('./clinic-chat/routes/orgs'));
 app.use('/api/notifications', require('./auth-profile/routes/notification'));
 app.use('/api/clinics/chatbot', require('./clinic-chat/routes/chatbot'));
 app.use('/api/auth', require('./auth-profile/routes/auth'));
+app.use('/api/scan', require('./scan/routes/scan'));
 // Medical Document Q&A Scan feature
 
 
